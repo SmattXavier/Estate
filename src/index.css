@@ -1,1 +1,35 @@
 @import "tailwindcss";
+
+/* Utility names for the design layer in theme.css. The values live there. */
+@theme inline {
+  --font-sans: var(--font);
+
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+
+  --color-surface: var(--surface);
+  --color-sunk: var(--sunk);
+  --color-bg: var(--bg);
+
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+
+  --color-amber: var(--amber);
+  --color-red: var(--red);
+  --color-green: var(--green);
+
+  --color-amber-bg: var(--amber-bg);
+  --color-red-bg: var(--red-bg);
+  --color-green-bg: var(--green-bg);
+
+  --radius-xs: var(--radius);
+  --radius-sm: var(--radius);
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius);
+  --radius-xl: var(--radius);
+  --radius-2xl: var(--radius);
+}

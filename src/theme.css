@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&display=swap');
+
+/* The design layer. Every screen reads from here; no screen hardcodes a
+   colour. Utility names (bg-primary, text-ink-soft, border-line) are mapped
+   onto these variables in index.css. */
+
+:root {
+  --ink: #14232B;
+  --ink-soft: #56696E;
+  --ink-faint: #8698A0;
+
+  --line: #D6DEDC;
+  --line-strong: #B6C3C1;
+
+  --surface: #FFFFFF;
+  --sunk: #F3F6F5;
+  --bg: #EAEEED;
+
+  --primary: #0E5A6E;
+  --primary-dark: #0A4353;
+
+  --amber: #A9761B;
+  --red: #A62A1F;
+  --green: #2F6E4F;
+
+  --amber-bg: #FBF2DE;
+  --red-bg: #FAE9E7;
+  --green-bg: #E6F0EA;
+
+  /* 3px everywhere. Emphasis never comes from a larger radius. */
+  --radius: 3px;
+
+  --font: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-stretch: 118%;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+
+/* Every ref, clock, countdown and money figure. Digits must not jitter as
+   they tick. */
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
