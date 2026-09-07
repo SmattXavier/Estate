@@ -4,6 +4,7 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../auth/context'
+import { useMediaQuery } from '../../lib/useMediaQuery'
 import IssueCard, { type Dispatch } from './IssueCard'
 import {
   BOARD_ISSUES_KEY,
@@ -32,16 +33,41 @@ function RailClock() {
   )
 }
 
-function Count({ label, value, alert }: { label: string; value: number; alert?: boolean }) {
+function Count({
+  label,
+  value,
+  alert,
+  stacked,
+}: {
+  label: string
+  value: number
+  alert?: boolean
+  stacked?: boolean
+}) {
+  const tone = alert && value > 0 ? 'text-red' : ''
+
+  // Stacked in the top bar, where the row scrolls sideways; in a rail there
+  // is width to put the number opposite its label.
+  if (stacked) {
+    return (
+      <div className="shrink-0">
+        <span className={`num block text-lg ${tone}`}>{value}</span>
+        <span className="block text-xs whitespace-nowrap text-surface/60">
+          {label}
+        </span>
+      </div>
+    )
+  }
+
   return (
     <div className="flex items-baseline justify-between border-b border-surface/10 py-2">
       <span className="text-sm text-surface/60">{label}</span>
-      <span className={`num text-lg ${alert && value > 0 ? 'text-red' : ''}`}>
-        {value}
-      </span>
+      <span className={`num text-lg ${tone}`}>{value}</span>
     </div>
   )
 }
+
+type LaneKey = 'needs' | 'out' | 'finished'
 
 function Lane({
   title,
@@ -79,6 +105,11 @@ export default function Board() {
   // The pick handed back by the directory. The expanded issue lives in the
   // URL so it survives a refresh; the draft reply deliberately does not.
   const draft = (location.state as { dispatch?: Dispatch } | null)?.dispatch
+
+  // Below this the three lanes stack into one, chosen by the segmented
+  // control; the rail becomes a top bar.
+  const wide = useMediaQuery('(min-width: 900px)')
+  const [lane, setLane] = useState<LaneKey>('needs')
 
   const [now, setNow] = useState(() => Date.now())
   useEffect(() => {
@@ -164,6 +195,96 @@ export default function Board() {
     )
   }
 
+  const lanes = [
+    {
+      key: 'needs' as const,
+      title: 'Needs you now',
+      issues: needsYouNow,
+      alert: pastTarget > 0,
+    },
+    { key: 'out' as const, title: 'Artisan out', issues: artisanOut },
+    { key: 'finished' as const, title: 'Finished', issues: finished },
+  ]
+
+  const counts = (
+    <>
+      <Count label="Past target" value={pastTarget} alert stacked={!wide} />
+      <Count label="Unassigned" value={needsYouNow.length} stacked={!wide} />
+      <Count label="Artisan out" value={artisanOut.length} stacked={!wide} />
+      <Count label="Finished" value={finished.length} stacked={!wide} />
+    </>
+  )
+
+  const signOutButton = (full: boolean) => (
+    <button
+      type="button"
+      onClick={() => void signOut()}
+      className={`shrink-0 rounded-sm border border-surface/25 px-3 py-2 text-sm text-surface/80 hover:border-surface/50 ${
+        full ? 'w-full' : ''
+      }`}
+    >
+      Sign out
+    </button>
+  )
+
+  if (!wide) {
+    const shown = lanes.find((l) => l.key === lane) ?? lanes[0]
+
+    return (
+      <div className="min-h-dvh bg-bg">
+        <header className="bg-ink px-4 py-4 text-surface">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="truncate text-sm text-surface/60">
+                {estate.data?.name ?? ' '}
+              </p>
+              <h1 className="mt-0.5 truncate text-lg">{profile?.full_name}</h1>
+            </div>
+            <div className="flex shrink-0 items-center gap-3">
+              <RailClock />
+              {signOutButton(false)}
+            </div>
+          </div>
+
+          {/* Four counts on a narrow screen: scroll them rather than wrap
+              them into an unreadable grid. */}
+          <div className="mt-3 flex gap-6 overflow-x-auto pb-1">{counts}</div>
+        </header>
+
+        <main className="p-4">
+          <div className="flex rounded-sm border border-line bg-surface">
+            {lanes.map((option) => (
+              <button
+                key={option.key}
+                type="button"
+                onClick={() => setLane(option.key)}
+                aria-pressed={option.key === lane}
+                className={`grow border-b-2 px-2 py-2.5 text-sm ${
+                  option.key === lane
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-ink-soft'
+                }`}
+              >
+                <span className="block truncate">{option.title}</span>
+                <span className="num text-xs">{option.issues.length}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-4">
+            <Lane
+              title={shown.title}
+              count={shown.issues.length}
+              alert={shown.alert}
+            >
+              {shown.issues.map(render)}
+            </Lane>
+          </div>
+        </main>
+      </div>
+    )
+  }
+
   return (
     <div className="flex min-h-dvh bg-bg">
       <aside className="w-60 shrink-0 bg-ink px-5 py-6 text-surface">
@@ -174,32 +295,22 @@ export default function Board() {
           <RailClock />
         </div>
 
-        <div className="mt-5">
-          <Count label="Past target" value={pastTarget} alert />
-          <Count label="Unassigned" value={needsYouNow.length} />
-          <Count label="Artisan out" value={artisanOut.length} />
-          <Count label="Finished" value={finished.length} />
-        </div>
+        <div className="mt-5">{counts}</div>
 
-        <button
-          type="button"
-          onClick={() => void signOut()}
-          className="mt-6 w-full rounded-sm border border-surface/25 px-3 py-2 text-sm text-surface/80 hover:border-surface/50"
-        >
-          Sign out
-        </button>
+        <div className="mt-6">{signOutButton(true)}</div>
       </aside>
 
-      <main className="grid grow grid-cols-1 gap-6 p-6 lg:grid-cols-3">
-        <Lane title="Needs you now" count={needsYouNow.length} alert={pastTarget > 0}>
-          {needsYouNow.map(render)}
-        </Lane>
-        <Lane title="Artisan out" count={artisanOut.length}>
-          {artisanOut.map(render)}
-        </Lane>
-        <Lane title="Finished" count={finished.length}>
-          {finished.map(render)}
-        </Lane>
+      <main className="grid grow grid-cols-3 gap-6 p-6">
+        {lanes.map((option) => (
+          <Lane
+            key={option.key}
+            title={option.title}
+            count={option.issues.length}
+            alert={option.alert}
+          >
+            {option.issues.map(render)}
+          </Lane>
+        ))}
       </main>
     </div>
   )

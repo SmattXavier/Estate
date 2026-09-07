@@ -1,7 +1,9 @@
 import { Fragment, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import Timeline from '../../components/Timeline'
+import { useMediaQuery } from '../../lib/useMediaQuery'
 import {
+  TONE_BORDER,
   TONE_CHIP,
   assignedWithinTarget,
   cardTone,
@@ -48,14 +50,82 @@ function Cell({
   return <td className={`px-3 py-2.5 align-top ${className}`}>{children}</td>
 }
 
+function Expanded({ issue }: { issue: BoardIssue }) {
+  return (
+    <>
+      <p className="flex gap-3 text-xs text-ink-faint">
+        <span>{issue.reporter?.full_name ?? 'Unknown'}</span>
+        <span className="num">{timeOfDay(issue.created_at)}</span>
+      </p>
+      <p className="mt-1.5">{issue.description}</p>
+      {/* Verbatim: the CEO reads the record as it was written. */}
+      <Timeline issueId={issue.id} />
+    </>
+  )
+}
+
 export default function IssueTable({ issues }: { issues: BoardIssue[] }) {
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [now, setNow] = useState(() => Date.now())
+  // A table needs width it does not have on a phone. Cards below, table
+  // above — one or the other, never both rendered and one hidden.
+  const wide = useMediaQuery('(min-width: 768px)')
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 30_000)
     return () => clearInterval(id)
   }, [])
+
+  if (!wide) {
+    return (
+      <ul className="space-y-3">
+        {issues.map((issue) => {
+          const expanded = expandedId === issue.id
+          const tone: Tone = isEscalated(issue) ? 'red' : cardTone(issue, now)
+
+          return (
+            <li
+              key={issue.id}
+              className={`rounded-sm border border-line border-l-4 bg-surface ${TONE_BORDER[tone]}`}
+            >
+              <button
+                type="button"
+                onClick={() => setExpandedId(expanded ? null : issue.id)}
+                aria-expanded={expanded}
+                className="w-full px-3.5 py-3 text-left"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <span className="num text-xs text-ink-faint">{issue.ref}</span>
+                  <span
+                    className={`shrink-0 rounded-sm border px-1.5 py-0.5 text-xs ${TONE_CHIP[tone]}`}
+                  >
+                    {chipLabel(issue)}
+                  </span>
+                </div>
+
+                <h3 className="mt-1 text-base">{issue.title}</h3>
+
+                <p className="mt-1 flex flex-wrap gap-x-3 text-xs text-ink-soft">
+                  <span>{issue.unit?.label ?? 'Unknown unit'}</span>
+                  <span>{issue.category}</span>
+                </p>
+
+                <p className="num mt-1.5 text-sm">
+                  <ToAssign issue={issue} now={now} /> to assign
+                </p>
+              </button>
+
+              {expanded && (
+                <div className="border-t border-line px-3.5 py-3">
+                  <Expanded issue={issue} />
+                </div>
+              )}
+            </li>
+          )
+        })}
+      </ul>
+    )
+  }
 
   return (
     <div className="overflow-x-auto rounded-sm border border-line bg-surface">
@@ -108,13 +178,7 @@ export default function IssueTable({ issues }: { issues: BoardIssue[] }) {
                 {expanded && (
                   <tr className="border-b border-line bg-sunk">
                     <td colSpan={7} className="px-3 py-3">
-                      <p className="flex gap-3 text-xs text-ink-faint">
-                        <span>{issue.reporter?.full_name ?? 'Unknown'}</span>
-                        <span className="num">{timeOfDay(issue.created_at)}</span>
-                      </p>
-                      <p className="mt-1.5">{issue.description}</p>
-                      {/* Verbatim: the CEO reads the record as it was written. */}
-                      <Timeline issueId={issue.id} />
+                      <Expanded issue={issue} />
                     </td>
                   </tr>
                 )}

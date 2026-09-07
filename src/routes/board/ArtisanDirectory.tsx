@@ -103,8 +103,8 @@ export default function ArtisanDirectory() {
 
   return (
     <div className="min-h-dvh bg-bg">
-      <header className="bg-ink px-6 py-4 text-surface">
-        <div className="flex items-center justify-between gap-6">
+      <header className="bg-ink px-4 py-4 text-surface sm:px-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
           <div className="min-w-0">
             <p className="flex gap-3 text-xs text-surface/60">
               <span className="num">{issue.data?.ref ?? ''}</span>
@@ -117,14 +117,14 @@ export default function ArtisanDirectory() {
           <button
             type="button"
             onClick={() => navigate(back)}
-            className="shrink-0 rounded-sm border border-surface/25 px-3 py-2 text-sm text-surface/80 hover:border-surface/50"
+            className="w-full shrink-0 rounded-sm border border-surface/25 px-3 py-2 text-sm text-surface/80 hover:border-surface/50 sm:w-auto"
           >
             Back to the issue
           </button>
         </div>
       </header>
 
-      <main className="p-6">
+      <main className="p-4 sm:p-6">
         <div className="flex flex-wrap gap-2">
           {['All', ...trades].map((option) => (
             <button

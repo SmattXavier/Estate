@@ -97,12 +97,8 @@ Never hardcode these in the frontend. Read `sla_due_at` off the row.
 
 Three genuinely different screens, not one dashboard with a role switch.
 
-- **Resident** — responsive. Below 768px, a single column with two tabs,
-  "Report a fault" and "Your reports". At 768px and above, both side by side
-  inside a container capped at 1100px and centred, and there are no tabs at
-  all — the desktop layout does not render them. Plain language at every
-  width. Never the words "SLA", "ticket", "escalate", "dispatch". Say
-  "someone is coming".
+- **Resident** — mobile-first, single column, max 440px. Plain language. Never
+  the words "SLA", "ticket", "escalate", "dispatch". Say "someone is coming".
 - **Facility manager** — dense three-lane board, desktop-first: *Needs you
   now* (submitted, least time left first) / *Artisan out* (assigned) /
   *Finished* (resolved + closed). The artisan directory is a separate route

@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../auth/context'
 import ReportForm from './ReportForm'
 import ReportList from './ReportList'
+import { useMediaQuery } from '../../lib/useMediaQuery'
 import type { Issue, Unit } from '../../lib/issues'
 
 type Tab = 'report' | 'reports'
@@ -11,6 +12,8 @@ type Tab = 'report' | 'reports'
 export default function MyIssues() {
   const { profile, signOut } = useAuth()
   const [tab, setTab] = useState<Tab>('report')
+  // Two columns above this width, and then there are no tabs to be on.
+  const wide = useMediaQuery('(min-width: 768px)')
 
   const issues = useQuery({
     queryKey: ['my-issues', profile?.id],
@@ -66,9 +69,9 @@ export default function MyIssues() {
   return (
     <div className="min-h-screen bg-bg">
       {/* The hairline arrives exactly when there is background beside the
-          column to read it against; below 440px it is edge to edge. */}
-      <div className="mx-auto min-h-screen w-full max-w-[440px] border-line bg-surface min-[441px]:border-x">
-        <header className="bg-ink px-5 py-6 text-surface">
+          container to read it against; below 440px it is edge to edge. */}
+      <div className="mx-auto min-h-screen w-full max-w-[1100px] border-line bg-surface min-[441px]:border-x md:bg-transparent md:border-x-0">
+        <header className="bg-ink px-5 py-6 text-surface md:px-8">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-sm text-surface/60">
@@ -90,32 +93,53 @@ export default function MyIssues() {
           </p>
         </header>
 
-        <nav className="flex border-b border-line">
-          {(
-            [
-              ['report', 'Report a fault'],
-              ['reports', 'Your reports'],
-            ] as [Tab, string][]
-          ).map(([value, label]) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => setTab(value)}
-              className={`grow border-b-2 px-4 py-3 text-sm font-medium ${
-                tab === value
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-ink-soft'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </nav>
+        {wide ? (
+          // 5:6 — the list carries more per row than the form does.
+          <div className="grid grid-cols-11 gap-6 px-8 py-8">
+            <section className="col-span-5 min-w-0 rounded-sm border border-line bg-surface">
+              <h2 className="border-b border-line px-5 py-3 text-base">
+                Report a fault
+              </h2>
+              <ReportForm onLogged={() => undefined} />
+            </section>
 
-        {tab === 'report' ? (
-          <ReportForm onLogged={() => setTab('reports')} />
+            <section className="col-span-6 min-w-0 rounded-sm border border-line bg-surface">
+              <h2 className="border-b border-line px-5 py-3 text-base">
+                Your reports
+              </h2>
+              <ReportList issues={issues.data ?? []} />
+            </section>
+          </div>
         ) : (
-          <ReportList issues={issues.data ?? []} />
+          <>
+            <nav className="flex border-b border-line">
+              {(
+                [
+                  ['report', 'Report a fault'],
+                  ['reports', 'Your reports'],
+                ] as [Tab, string][]
+              ).map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setTab(value)}
+                  className={`grow border-b-2 px-4 py-3 text-sm font-medium ${
+                    tab === value
+                      ? 'border-primary text-primary'
+                      : 'border-transparent text-ink-soft'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </nav>
+
+            {tab === 'report' ? (
+              <ReportForm onLogged={() => setTab('reports')} />
+            ) : (
+              <ReportList issues={issues.data ?? []} />
+            )}
+          </>
         )}
       </div>
     </div>

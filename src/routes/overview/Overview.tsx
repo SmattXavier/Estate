@@ -14,7 +14,7 @@ import IssueTable from './IssueTable'
 
 function Figure({ label, value }: { label: string; value: string }) {
   return (
-    <div className="grow px-5 py-4">
+    <div className="min-w-0 px-5 py-4">
       <p className="num text-2xl">{value}</p>
       <p className="mt-0.5 text-xs text-ink-soft">{label}</p>
     </div>
@@ -86,7 +86,7 @@ export default function Overview() {
   return (
     <main className="min-h-dvh bg-bg text-ink">
       <header className="bg-ink text-surface">
-        <div className="mx-auto flex w-full max-w-5xl items-start justify-between gap-6 px-6 py-6">
+        <div className="mx-auto flex w-full max-w-5xl items-start justify-between gap-6 px-4 py-6 sm:px-6">
           <div>
             <p className="text-sm text-surface/60">{estate.data?.name ?? ' '}</p>
             <h1 className="mt-1 text-xl">{profile?.full_name}</h1>
@@ -107,8 +107,8 @@ export default function Overview() {
 
       <AlertPanel issues={all} />
 
-      <div className="mx-auto w-full max-w-5xl px-6 py-6">
-        <div className="flex divide-x divide-line rounded-sm border border-line bg-surface">
+      <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6">
+        <div className="grid grid-cols-2 divide-x divide-y divide-line rounded-sm border border-line bg-surface md:grid-cols-4 md:divide-y-0">
           <Figure label="Open issues" value={String(open)} />
           <Figure label="Past target now" value={String(pastTarget)} />
           <Figure label="Average time to assign" value={averageToAssign} />

@@ -16,8 +16,8 @@ export default function SignIn() {
   }
 
   return (
-    <main className="min-h-dvh bg-bg px-5 py-16 text-ink">
-      <div className="mx-auto w-full max-w-[380px]">
+    <main className="flex min-h-dvh items-center justify-center bg-bg px-4 py-12 text-ink min-[400px]:px-5">
+      <div className="w-full max-w-[380px]">
         <p className="text-xs uppercase tracking-[0.14em] text-primary">
           Wuse II Estate, Abuja
         </p>
