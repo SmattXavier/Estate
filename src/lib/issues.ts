@@ -48,6 +48,7 @@ export type Clocked = {
 }
 
 export const BOARD_ISSUES_KEY = ['board-issues']
+export const OVERVIEW_ISSUES_KEY = ['overview-issues']
 
 export type Tone = 'green' | 'amber' | 'red' | 'primary' | 'grey'
 
@@ -151,6 +152,7 @@ export type BoardIssue = Issue & {
   resolved_at: string | null
   closed_at: string | null
   nudged_at: string | null
+  work_cost: number | string | null
   reporter: { full_name: string; phone: string | null } | null
   technician: { full_name: string; trade: string; phone: string } | null
 }
@@ -158,6 +160,55 @@ export type BoardIssue = Issue & {
 export const BOARD_SELECT =
   'id, ref, unit_id, title, description, category, priority, status, created_at, ' +
   'clock_started_at, sla_due_at, escalated_at, access_permission, assigned_at, ' +
-  'assigned_technician_id, resolved_at, closed_at, nudged_at, ' +
+  'assigned_technician_id, resolved_at, closed_at, nudged_at, work_cost, ' +
   'unit:units(label), reporter:profiles(full_name, phone), ' +
   'technician:technicians(full_name, trade, phone)'
+
+/**
+ * Escalated *and* still nobody's job. This is the CEO's alert set, and it is
+ * read off the server stamp only — never from comparing sla_due_at to the
+ * browser clock (Rule 14). Both the alert panel and the "past target now"
+ * figure call this, so the two can never disagree on screen.
+ */
+export function isEscalated(issue: {
+  status: IssueStatus
+  escalated_at: string | null
+}): boolean {
+  return issue.status === 'submitted' && issue.escalated_at !== null
+}
+
+/**
+ * Minutes from the clock starting to an artisan being named. Measured from
+ * clock_started_at, not created_at, so a reopened fault is not charged for
+ * the time it spent correctly closed (STATES.md). Null until assigned.
+ */
+export function minutesToAssign(issue: {
+  assigned_at: string | null
+  clock_started_at: string
+}): number | null {
+  if (!issue.assigned_at) return null
+  const start = new Date(issue.clock_started_at).getTime()
+  return Math.round((new Date(issue.assigned_at).getTime() - start) / 60_000)
+}
+
+/** Did the assignment land inside the promised window? Null until assigned. */
+export function assignedWithinTarget(issue: {
+  assigned_at: string | null
+  sla_due_at: string
+}): boolean | null {
+  if (!issue.assigned_at) return null
+  return new Date(issue.assigned_at).getTime() <= new Date(issue.sla_due_at).getTime()
+}
+
+const NAIRA = new Intl.NumberFormat('en-NG', {
+  style: 'currency',
+  currency: 'NGN',
+  maximumFractionDigits: 0,
+})
+
+/** numeric(12,2) can arrive as a string; a dash beats "₦NaN". */
+export function naira(value: number | string | null): string {
+  if (value === null || value === '') return '—'
+  const amount = Number(value)
+  return Number.isFinite(amount) ? NAIRA.format(amount) : '—'
+}

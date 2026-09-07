@@ -3,10 +3,10 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { useAuth } from './auth/context'
 import type { Role } from './auth/context'
 import SignIn from './routes/SignIn'
-import { Overview } from './routes/Placeholders'
 import MyIssues from './routes/my/MyIssues'
 import Board from './routes/board/Board'
 import ArtisanDirectory from './routes/board/ArtisanDirectory'
+import Overview from './routes/overview/Overview'
 
 const HOME: Record<Role, string> = {
   resident: '/my',

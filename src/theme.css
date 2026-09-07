@@ -33,40 +33,46 @@
   --font: 'Archivo', ui-sans-serif, system-ui, sans-serif;
 }
 
-html {
-  background: var(--bg);
-}
+/* These are element defaults, so they belong in the same layer as Tailwind's
+   preflight. Unlayered they would outrank every utility — `button { color }`
+   below would silently beat `text-red` on any button in the app. Layer order
+   is declared by Tailwind in index.css; naming `base` here appends to it. */
+@layer base {
+  html {
+    background: var(--bg);
+  }
 
-body {
-  margin: 0;
-  font-family: var(--font);
-  font-size: 15px;
-  line-height: 1.5;
-  font-weight: 400;
-  color: var(--ink);
-  -webkit-font-smoothing: antialiased;
-}
+  body {
+    margin: 0;
+    font-family: var(--font);
+    font-size: 15px;
+    line-height: 1.5;
+    font-weight: 400;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
 
-h1,
-h2,
-h3,
-h4 {
-  font-stretch: 118%;
-  font-weight: 700;
-  letter-spacing: -0.015em;
-  margin: 0;
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-stretch: 118%;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    margin: 0;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
 }
 
 /* Every ref, clock, countdown and money figure. Digits must not jitter as
    they tick. */
 .num {
   font-variant-numeric: tabular-nums;
-}
-
-button,
-input,
-select,
-textarea {
-  font: inherit;
-  color: inherit;
 }

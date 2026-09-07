@@ -22,13 +22,17 @@ export default function CountdownBar({ issue }: { issue: Clocked }) {
 
   const { remaining, fraction } = windowLeft(issue, now)
   const tone = countdownTone(remaining, fraction)
+  // Past the target the window is spent, not absent: a full red bar. The
+  // fraction clamps to 0 at the deadline, which would otherwise leave an
+  // empty grey track exactly when the bar matters most.
+  const filled = remaining <= 0 ? 1 : fraction
 
   return (
     <div className="mt-3 flex items-center gap-3">
       <div className="h-1.5 grow overflow-hidden rounded-sm bg-sunk">
         <div
           className={`h-full rounded-sm ${TONE_FILL[tone]} transition-[width] duration-1000 ease-linear`}
-          style={{ width: `${fraction * 100}%` }}
+          style={{ width: `${filled * 100}%` }}
         />
       </div>
       <span

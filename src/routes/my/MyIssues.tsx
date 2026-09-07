@@ -64,8 +64,10 @@ export default function MyIssues() {
   const where = flats.length === 1 ? flats[0].label : `${flats.length} flats`
 
   return (
-    <div className="min-h-dvh bg-bg">
-      <div className="mx-auto min-h-dvh w-full max-w-[440px] bg-surface">
+    <div className="min-h-screen bg-bg">
+      {/* The hairline arrives exactly when there is background beside the
+          column to read it against; below 440px it is edge to edge. */}
+      <div className="mx-auto min-h-screen w-full max-w-[440px] border-line bg-surface min-[441px]:border-x">
         <header className="bg-ink px-5 py-6 text-surface">
           <div className="flex items-start justify-between gap-3">
             <div>
