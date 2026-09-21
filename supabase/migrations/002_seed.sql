@@ -1,14 +1,20 @@
--- 002_seed.sql
--- Run this AFTER 001_schema.sql and 003_functions.sql.
+-- 002_seed.sql  (v3)
 --
--- BEFORE running it, create three users in the Supabase dashboard:
---   Authentication → Users → Add user → "Auto Confirm User" ON
---     resident@demo.test  / demo1234
---     fm@demo.test        / demo1234
---     ceo@demo.test       / demo1234
+-- Resets the core demo: estate, three people, seven units, ten artisans,
+-- seven issues with their history. Run in the ESTATE project only
+-- (URL must contain kgpoqkjcjznetnubrvrl).
 --
--- This file looks them up by email and stops with a clear message if any
--- are missing. It is safe to re-run: it clears demo data first.
+-- v3 changes:
+--   * Clears the Phase 2 tables first. They reference units, technicians and
+--     profiles, so without this the core deletes fail on foreign keys.
+--   * Ends with a visible summary row, because the Supabase editor does not
+--     display RAISE NOTICE output.
+--
+-- AFTER running this, run 008_seed_phase2.sql. This file deletes the artisan
+-- and security profiles along with everything else; 008 puts them back.
+--
+-- Requires these auth users to exist (Authentication -> Users, Auto Confirm ON):
+--   resident@demo.test, fm@demo.test, ceo@demo.test  (all demo1234)
 
 do $$
 declare
@@ -26,10 +32,25 @@ begin
 
   if v_res is null or v_fm is null or v_ceo is null then
     raise exception
-      'Create resident@demo.test, fm@demo.test and ceo@demo.test in Authentication → Users first (Auto Confirm ON), then re-run this file.';
+      'Create resident@demo.test, fm@demo.test and ceo@demo.test in Authentication -> Users first (Auto Confirm ON), then re-run this file.';
   end if;
 
-  -- Clean slate, so this file can be re-run before the demo.
+  -- ------------------------------------------------------------------
+  -- Clean slate.
+  --
+  -- Phase 2 tables first: they reference units, technicians and profiles,
+  -- so the core deletes below would fail on foreign keys otherwise.
+  -- Guarded with to_regclass so this still runs on a database that has
+  -- never had Phase 2 applied.
+  -- ------------------------------------------------------------------
+  if to_regclass('public.gate_events')      is not null then execute 'delete from gate_events';      end if;
+  if to_regclass('public.visitor_passes')   is not null then execute 'delete from visitor_passes';   end if;
+  if to_regclass('public.staff_shifts')     is not null then execute 'delete from staff_shifts';     end if;
+  if to_regclass('public.service_payments') is not null then execute 'delete from service_payments'; end if;
+  if to_regclass('public.service_expenses') is not null then execute 'delete from service_expenses'; end if;
+  if to_regclass('public.service_bills')    is not null then execute 'delete from service_bills';    end if;
+  if to_regclass('public.service_periods')  is not null then execute 'delete from service_periods';  end if;
+
   delete from issue_updates;
   delete from issues;
   delete from technicians;
@@ -46,14 +67,10 @@ begin
     (v_fm,  v_estate, 'Chidi Nwosu',        '0802 556 1187', 'facility_manager'),
     (v_ceo, v_estate, 'Mrs. Adaeze Onwuka', '0805 900 4412', 'ceo');
 
-  -- Ngozi holds two units so she has more than one report to show.
   insert into units (estate_id, label, resident_id) values
     (v_estate, 'Block C, Flat 12', v_res) returning id into v_unit_c12;
   insert into units (estate_id, label, resident_id) values
     (v_estate, 'Block B, Flat 15', v_res) returning id into v_unit_b15;
-
-  -- Other units carry historical issues. No resident login behind them,
-  -- so they are reported_by Ngozi for the demo's sake but labelled by unit.
   insert into units (estate_id, label, resident_id) values
     (v_estate, 'Block A, Flat 3',  v_res) returning id into v_unit_a3;
   insert into units (estate_id, label, resident_id) values
@@ -87,11 +104,10 @@ begin
     (v_estate, 'Joseph Okon',     'Security',         '0808 992 4471', 'In-house', '2022') returning id into t_sec;
 
   -- ------------------------------------------------------------------
-  -- Issues. Times are relative to now(), so the board always looks right
-  -- however long before the demo you run this.
+  -- Issues, relative to now() so the board always looks right.
   -- ------------------------------------------------------------------
 
-  -- 1. Overdue by ~14 min. High, 1h target, logged 74 min ago.
+  -- 1. Overdue by ~14 min.
   insert into issues (estate_id, ref, unit_id, reported_by, category, priority, title,
                       description, access_permission, status, created_at, clock_started_at,
                       sla_due_at, escalated_at)
@@ -106,7 +122,7 @@ begin
     (v_id, null, 'System', 'escalation',
      'No artisan assigned within the high target. Raised to the CEO.', now() - interval '14 min');
 
-  -- 2. Emergency, 15m target, logged 22 min ago — overdue by 7.
+  -- 2. Emergency, overdue by 7.
   insert into issues (estate_id, ref, unit_id, reported_by, category, priority, title,
                       description, access_permission, status, created_at, clock_started_at,
                       sla_due_at, escalated_at)
@@ -121,7 +137,7 @@ begin
     (v_id, null, 'System', 'escalation',
      'No artisan assigned within the emergency target. Raised to the CEO.', now() - interval '7 min');
 
-  -- 3. High, 8 minutes left. This is the one that turns red during the demo.
+  -- 3. Eight minutes from turning red — the one to watch during a demo.
   insert into issues (estate_id, ref, unit_id, reported_by, category, priority, title,
                       description, access_permission, status, created_at, clock_started_at, sla_due_at)
   values (v_estate, 'MR-1039', v_unit_b7, v_res, 'Generator', 'high',
@@ -149,7 +165,7 @@ begin
      'Dispatched Musa Danladi (Water supply). He is checking the booster pump this afternoon, should be back on by 4pm.',
      now() - interval '41 min');
 
-  -- 5. Fixed, waiting on the resident to confirm.
+  -- 5. Fixed, waiting on the resident.
   insert into issues (estate_id, ref, unit_id, reported_by, category, priority, title,
                       description, access_permission, status, created_at, clock_started_at,
                       sla_due_at, assigned_at, assigned_technician_id, resolved_at,
@@ -170,7 +186,7 @@ begin
      'Marked resolved: Cleared blockage in the P-trap and replaced the corroded trap assembly.',
      now() - interval '58 min');
 
-  -- 6. Closed, complete history. This is the row that makes the CSV look real.
+  -- 6. Closed, full history.
   insert into issues (estate_id, ref, unit_id, reported_by, category, priority, title,
                       description, access_permission, status, created_at, clock_started_at,
                       sla_due_at, assigned_at, assigned_technician_id, resolved_at, closed_at,
@@ -190,7 +206,7 @@ begin
      'Marked resolved: Rescheduled the collection contractor and cleared the bay.', now() - interval '1700 min'),
     (v_id, v_res, 'Ngozi Okafor', 'confirmation', 'Confirmed the work was done', now() - interval '1600 min');
 
-  -- 7. Comfortably inside target — proves green is reachable.
+  -- 7. Well inside target.
   insert into issues (estate_id, ref, unit_id, reported_by, category, priority, title,
                       description, access_permission, status, created_at, clock_started_at, sla_due_at)
   values (v_estate, 'MR-1035', v_unit_b15, v_res, 'Air conditioning', 'normal',
@@ -202,11 +218,18 @@ begin
   insert into issue_updates (issue_id, author_id, author_name, kind, body, created_at) values
     (v_id, v_res, 'Ngozi Okafor', 'log', 'Reported the fault', now() - interval '11 min');
 
-  -- The refs above are hardcoded, so the sequence has to be pushed past the
-  -- highest of them. Derive it rather than hardcoding a number here too:
-  -- the next log_issue() then mints MR-1042 and cannot collide.
+  -- Push the ref sequence past the highest hardcoded ref, derived rather
+  -- than hardcoded, so the next log_issue() mints MR-1042 and cannot collide.
   perform setval('issue_ref_seq', (select max(substring(ref from 4)::bigint) from issues), true);
-
-  raise notice 'Seeded: 1 estate, 3 people, 7 units, 10 artisans, 7 issues (2 already overdue). Next ref MR-%.',
-    (select max(substring(ref from 4)::bigint) from issues) + 1;
 end $$;
+
+-- Visible summary. The editor shows this; it does not show notices.
+-- Expect: 7 issues, 4 waiting (2 escalated), 1 out, 2 finished, next ref MR-1042.
+select
+  (select count(*) from issues)                                            as issues,
+  (select count(*) from issues where status = 'submitted')                 as waiting,
+  (select count(*) from issues where escalated_at is not null
+                                 and status = 'submitted')                 as escalated,
+  (select count(*) from issues where status = 'assigned')                  as artisan_out,
+  (select count(*) from issues where status in ('resolved','closed'))      as finished,
+  'MR-' || (select max(substring(ref from 4)::bigint) + 1 from issues)     as next_ref;

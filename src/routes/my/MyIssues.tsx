@@ -64,7 +64,10 @@ export default function MyIssues() {
 
   const open = issues.data?.filter((issue) => issue.status !== 'closed').length ?? 0
   const flats = units.data ?? []
-  const where = flats.length === 1 ? flats[0].label : `${flats.length} flats`
+  // A name, not a tally. The seed gives this resident every unit on the
+  // estate, and "7 flats" told them nothing about their own home. The form's
+  // selector still offers all of them.
+  const where = flats[0]?.label ?? ''
 
   return (
     <div className="min-h-screen bg-bg">

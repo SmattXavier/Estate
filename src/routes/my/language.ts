@@ -37,19 +37,19 @@ export const PRIORITY_CHOICES: {
 export const PRIORITY_HELP =
   'This is how quickly the estate office aims to have someone on their way to you.'
 
-export function chipLabel(issue: Clocked, now: number): string {
-  switch (issue.status) {
-    case 'submitted':
-      return windowLeft(issue, now).remaining <= 0 ? 'Late' : 'Waiting'
-    case 'assigned':
-      return 'On the way'
-    case 'resolved':
-      return 'Done'
-    case 'closed':
-      return 'Closed'
-  }
-}
-
+/**
+ * One sentence per status, and never a promise the row does not support.
+ *
+ * "Someone is on the way" is keyed on status === 'assigned', which is exactly
+ * "assigned_technician_id is set": assign_technician writes both in one
+ * statement and reopen_issue clears both, so the two cannot drift apart on a
+ * submitted or assigned row. Verified against the live data.
+ *
+ * The artisan's name is deliberately absent. technicians_staff RLS hides the
+ * roster from residents — the embed comes back null and a direct read returns
+ * nothing — so there is no name to interpolate here. The resident does see it,
+ * written out by the manager, in the dispatch entry on the timeline below.
+ */
 export function statusLine(issue: Clocked, now: number): string {
   switch (issue.status) {
     case 'submitted':
@@ -57,11 +57,11 @@ export function statusLine(issue: Clocked, now: number): string {
         ? 'Later than we promised. Still waiting on the estate office.'
         : 'Waiting on the estate office.'
     case 'assigned':
-      return 'Someone is coming.'
+      return 'Someone is on the way.'
     case 'resolved':
-      return 'The work is done.'
+      return 'The work is done. Please confirm.'
     case 'closed':
-      return 'Finished and closed.'
+      return 'Closed.'
   }
 }
 
