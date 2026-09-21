@@ -5,6 +5,31 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>estate</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!--
+      Runs before the first paint, so a dark-mode user never sees a white
+      flash. Saved choice wins; otherwise follow the system. Wrapped in
+      try/catch because localStorage throws outright in some privacy modes.
+    -->
+    <script>
+      ;(function () {
+        try {
+          var saved = localStorage.getItem('estate-theme')
+          var dark =
+            saved === 'dark' ||
+            (saved !== 'light' &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches)
+          if (dark) document.documentElement.classList.add('dark')
+        } catch (e) {}
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

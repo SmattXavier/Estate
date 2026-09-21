@@ -102,29 +102,39 @@ export default function ArtisanDirectory() {
   }
 
   return (
-    <div className="min-h-dvh bg-bg">
-      <header className="bg-ink px-4 py-4 text-surface sm:px-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+    <div className="p-4 sm:p-6">
+      {/* Context only when we came from an issue; otherwise this is the
+          roster, reached from the sidebar. */}
+      {issueId ? (
+        <div className="flex flex-col gap-3 rounded-sm border border-subtle bg-card px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
-            <p className="flex gap-3 text-xs text-surface/60">
+            <p className="flex gap-3 text-xs text-foreground-faint">
               <span className="num">{issue.data?.ref ?? ''}</span>
               <span>{issue.data?.unit?.label ?? ''}</span>
             </p>
-            <h1 className="mt-0.5 truncate text-lg">
+            <h1 className="mt-0.5 truncate text-base">
               {issue.data?.title ?? 'Choose an artisan'}
             </h1>
           </div>
           <button
             type="button"
             onClick={() => navigate(back)}
-            className="w-full shrink-0 rounded-sm border border-surface/25 px-3 py-2 text-sm text-surface/80 hover:border-surface/50 sm:w-auto"
+            className="w-full shrink-0 rounded-sm border border-subtle px-3 py-2 text-sm hover:border-primary hover:text-primary sm:w-auto"
           >
             Back to the issue
           </button>
         </div>
-      </header>
+      ) : (
+        <div>
+          <h1 className="text-xl">Artisans</h1>
+          <p className="mt-1 text-sm text-foreground-muted">
+            Everyone on the books for this estate. Open an issue from the
+            board to send one of them out.
+          </p>
+        </div>
+      )}
 
-      <main className="p-4 sm:p-6">
+      <div className="mt-5">
         <div className="flex flex-wrap gap-2">
           {['All', ...trades].map((option) => (
             <button
@@ -133,8 +143,8 @@ export default function ArtisanDirectory() {
               onClick={() => setTrade(option)}
               className={`rounded-sm border px-3 py-1.5 text-sm ${
                 option === active
-                  ? 'border-primary bg-sunk text-primary'
-                  : 'border-line bg-surface text-ink-soft hover:border-line-strong'
+                  ? 'border-primary bg-surface-2 text-primary'
+                  : 'border-subtle bg-card text-foreground-muted hover:border-strong'
               }`}
             >
               {option}
@@ -149,18 +159,18 @@ export default function ArtisanDirectory() {
             return (
               <li
                 key={technician.id}
-                className="rounded-sm border border-line bg-surface p-4"
+                className="rounded-sm border border-subtle bg-card p-4"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <h2 className="text-base">{technician.full_name}</h2>
-                    <p className="text-sm text-ink-soft">{technician.trade}</p>
+                    <p className="text-sm text-foreground-muted">{technician.trade}</p>
                   </div>
                   <span
-                    className={`num shrink-0 rounded-sm border px-1.5 py-0.5 text-xs ${
+                    className={`shrink-0 rounded-sm border px-1.5 py-0.5 text-xs ${
                       stretched
-                        ? 'border-amber/35 bg-amber-bg text-amber'
-                        : 'border-line bg-sunk text-ink-soft'
+                        ? 'border-warning/35 bg-warning-soft text-warning'
+                        : 'border-subtle bg-surface-2 text-foreground-muted'
                     }`}
                   >
                     {open === 1 ? '1 open job' : `${open} open jobs`}
@@ -168,25 +178,25 @@ export default function ArtisanDirectory() {
                   </span>
                 </div>
 
-                <dl className="mt-3 space-y-1 text-sm text-ink-soft">
+                <dl className="mt-3 space-y-1 text-sm text-foreground-muted">
                   <div className="flex justify-between gap-3">
                     <dt>Phone</dt>
-                    <dd className="num text-ink">{technician.phone}</dd>
+                    <dd className="num text-foreground">{technician.phone}</dd>
                   </div>
                   <div className="flex justify-between gap-3">
                     <dt>Engagement</dt>
-                    <dd className="text-ink">{technician.engagement}</dd>
+                    <dd className="text-foreground">{technician.engagement}</dd>
                   </div>
                   <div className="flex justify-between gap-3">
                     <dt>Experience</dt>
-                    <dd className="text-ink">{onBooks(technician.on_books_since)}</dd>
+                    <dd className="text-foreground">{onBooks(technician.on_books_since)}</dd>
                   </div>
                 </dl>
 
                 <button
                   type="button"
                   onClick={() => choose(technician)}
-                  className="mt-4 w-full rounded-sm bg-primary px-4 py-2.5 text-sm font-medium text-surface hover:bg-primary-dark"
+                  className="mt-4 w-full rounded-sm bg-primary px-4 py-2.5 text-sm font-medium text-shell-foreground hover:bg-primary-hover"
                 >
                   Send {technician.full_name.split(' ')[0]}
                 </button>
@@ -196,11 +206,11 @@ export default function ArtisanDirectory() {
         </ul>
 
         {!shown.length && (
-          <p className="mt-6 text-sm text-ink-soft">
+          <p className="mt-6 text-sm text-foreground-muted">
             No active artisan on the books for {active}.
           </p>
         )}
-      </main>
+      </div>
     </div>
   )
 }

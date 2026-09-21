@@ -30,14 +30,18 @@ function ToAssign({ issue, now }: { issue: BoardIssue; now: number }) {
       (now - new Date(issue.clock_started_at).getTime()) / 60_000,
     )
     return (
-      <span className={isEscalated(issue) ? 'text-red' : 'text-ink-soft'}>
-        {waiting} min so far
+      <span className={isEscalated(issue) ? 'text-destructive' : 'text-foreground-muted'}>
+        <span className="num">{waiting}</span> min so far
       </span>
     )
   }
 
   const late = assignedWithinTarget(issue) === false
-  return <span className={late ? 'text-red' : undefined}>{minutes} min</span>
+  return (
+    <span className={late ? 'text-destructive' : undefined}>
+      <span className="num">{minutes}</span> min
+    </span>
+  )
 }
 
 function Cell({
@@ -53,7 +57,7 @@ function Cell({
 function Expanded({ issue }: { issue: BoardIssue }) {
   return (
     <>
-      <p className="flex gap-3 text-xs text-ink-faint">
+      <p className="flex gap-3 text-xs text-foreground-faint">
         <span>{issue.reporter?.full_name ?? 'Unknown'}</span>
         <span className="num">{timeOfDay(issue.created_at)}</span>
       </p>
@@ -81,12 +85,12 @@ export default function IssueTable({ issues }: { issues: BoardIssue[] }) {
       <ul className="space-y-3">
         {issues.map((issue) => {
           const expanded = expandedId === issue.id
-          const tone: Tone = isEscalated(issue) ? 'red' : cardTone(issue, now)
+          const tone: Tone = isEscalated(issue) ? 'destructive' : cardTone(issue, now)
 
           return (
             <li
               key={issue.id}
-              className={`rounded-sm border border-line border-l-4 bg-surface ${TONE_BORDER[tone]}`}
+              className={`rounded-sm border border-subtle border-l-4 bg-card ${TONE_BORDER[tone]}`}
             >
               <button
                 type="button"
@@ -95,7 +99,7 @@ export default function IssueTable({ issues }: { issues: BoardIssue[] }) {
                 className="w-full px-3.5 py-3 text-left"
               >
                 <div className="flex items-start justify-between gap-3">
-                  <span className="num text-xs text-ink-faint">{issue.ref}</span>
+                  <span className="num text-xs text-foreground-faint">{issue.ref}</span>
                   <span
                     className={`shrink-0 rounded-sm border px-1.5 py-0.5 text-xs ${TONE_CHIP[tone]}`}
                   >
@@ -105,18 +109,18 @@ export default function IssueTable({ issues }: { issues: BoardIssue[] }) {
 
                 <h3 className="mt-1 text-base">{issue.title}</h3>
 
-                <p className="mt-1 flex flex-wrap gap-x-3 text-xs text-ink-soft">
+                <p className="mt-1 flex flex-wrap gap-x-3 text-xs text-foreground-muted">
                   <span>{issue.unit?.label ?? 'Unknown unit'}</span>
                   <span>{issue.category}</span>
                 </p>
 
-                <p className="num mt-1.5 text-sm">
+                <p className="mt-1.5 text-sm">
                   <ToAssign issue={issue} now={now} /> to assign
                 </p>
               </button>
 
               {expanded && (
-                <div className="border-t border-line px-3.5 py-3">
+                <div className="border-t border-subtle px-3.5 py-3">
                   <Expanded issue={issue} />
                 </div>
               )}
@@ -128,10 +132,10 @@ export default function IssueTable({ issues }: { issues: BoardIssue[] }) {
   }
 
   return (
-    <div className="overflow-x-auto rounded-sm border border-line bg-surface">
+    <div className="overflow-x-auto rounded-sm border border-subtle bg-card">
       <table className="w-full min-w-[54rem] border-collapse text-sm">
         <thead>
-          <tr className="border-b border-line text-left text-xs text-ink-faint">
+          <tr className="border-b border-subtle text-left text-xs text-foreground-faint">
             <th className="px-3 py-2 font-normal">Ref</th>
             <th className="px-3 py-2 font-normal">Issue</th>
             <th className="px-3 py-2 font-normal">Unit</th>
@@ -144,19 +148,19 @@ export default function IssueTable({ issues }: { issues: BoardIssue[] }) {
         <tbody>
           {issues.map((issue) => {
             const expanded = expandedId === issue.id
-            const tone: Tone = isEscalated(issue) ? 'red' : cardTone(issue, now)
+            const tone: Tone = isEscalated(issue) ? 'destructive' : cardTone(issue, now)
 
             return (
               <Fragment key={issue.id}>
                 <tr
                   onClick={() => setExpandedId(expanded ? null : issue.id)}
                   aria-expanded={expanded}
-                  className="cursor-pointer border-b border-line hover:bg-sunk"
+                  className="cursor-pointer border-b border-subtle hover:bg-surface-2"
                 >
-                  <Cell className="num text-ink-soft">{issue.ref}</Cell>
+                  <Cell className="num text-foreground-muted">{issue.ref}</Cell>
                   <Cell>
                     {issue.title}
-                    <span className="mt-0.5 block text-xs text-ink-faint">
+                    <span className="mt-0.5 block text-xs text-foreground-faint">
                       {issue.category}
                     </span>
                   </Cell>
@@ -176,7 +180,7 @@ export default function IssueTable({ issues }: { issues: BoardIssue[] }) {
                 </tr>
 
                 {expanded && (
-                  <tr className="border-b border-line bg-sunk">
+                  <tr className="border-b border-subtle bg-surface-2">
                     <td colSpan={7} className="px-3 py-3">
                       <Expanded issue={issue} />
                     </td>

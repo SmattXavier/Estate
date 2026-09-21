@@ -22,7 +22,7 @@ function RailClock() {
   }, [])
 
   return (
-    <span className="num text-2xl">
+    <span className="num text-lg">
       {new Date(now).toLocaleTimeString('en-NG', {
         hour: '2-digit',
         minute: '2-digit',
@@ -37,32 +37,21 @@ function Count({
   label,
   value,
   alert,
-  stacked,
 }: {
   label: string
   value: number
   alert?: boolean
-  stacked?: boolean
 }) {
-  const tone = alert && value > 0 ? 'text-red' : ''
-
-  // Stacked in the top bar, where the row scrolls sideways; in a rail there
-  // is width to put the number opposite its label.
-  if (stacked) {
-    return (
-      <div className="shrink-0">
-        <span className={`num block text-lg ${tone}`}>{value}</span>
-        <span className="block text-xs whitespace-nowrap text-surface/60">
-          {label}
-        </span>
-      </div>
-    )
-  }
-
   return (
-    <div className="flex items-baseline justify-between border-b border-surface/10 py-2">
-      <span className="text-sm text-surface/60">{label}</span>
-      <span className={`num text-lg ${tone}`}>{value}</span>
+    <div className="shrink-0">
+      <span
+        className={`num block text-lg ${alert && value > 0 ? 'text-destructive' : ''}`}
+      >
+        {value}
+      </span>
+      <span className="block text-xs whitespace-nowrap text-foreground-muted">
+        {label}
+      </span>
     </div>
   )
 }
@@ -84,11 +73,11 @@ function Lane({
     <section className="min-w-0">
       <header
         className={`flex items-baseline justify-between border-b-2 pb-2 ${
-          alert ? 'border-red' : 'border-ink'
+          alert ? 'border-destructive' : 'border-foreground'
         }`}
       >
-        <h2 className={`text-base ${alert ? 'text-red' : 'text-ink'}`}>{title}</h2>
-        <span className="num text-sm text-ink-soft">{count}</span>
+        <h2 className={`text-base ${alert ? 'text-destructive' : 'text-foreground'}`}>{title}</h2>
+        <span className="num text-sm text-foreground-muted">{count}</span>
       </header>
       <ul className="mt-3 space-y-3">{children}</ul>
     </section>
@@ -96,7 +85,7 @@ function Lane({
 }
 
 export default function Board() {
-  const { profile, signOut } = useAuth()
+  const { profile } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [params, setParams] = useSearchParams()
@@ -130,20 +119,6 @@ export default function Board() {
     },
     enabled: !!profile,
     refetchInterval: 15_000,
-  })
-
-  const estate = useQuery({
-    queryKey: ['estate', profile?.estate_id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('estates')
-        .select('name')
-        .eq('id', profile!.estate_id)
-        .maybeSingle()
-      if (error) throw error
-      return data
-    },
-    enabled: !!profile,
   })
 
   const all = issues.data ?? []
@@ -206,101 +181,59 @@ export default function Board() {
     { key: 'finished' as const, title: 'Finished', issues: finished },
   ]
 
-  const counts = (
-    <>
-      <Count label="Past target" value={pastTarget} alert stacked={!wide} />
-      <Count label="Unassigned" value={needsYouNow.length} stacked={!wide} />
-      <Count label="Artisan out" value={artisanOut.length} stacked={!wide} />
-      <Count label="Finished" value={finished.length} stacked={!wide} />
-    </>
-  )
-
-  const signOutButton = (full: boolean) => (
-    <button
-      type="button"
-      onClick={() => void signOut()}
-      className={`shrink-0 rounded-sm border border-surface/25 px-3 py-2 text-sm text-surface/80 hover:border-surface/50 ${
-        full ? 'w-full' : ''
-      }`}
-    >
-      Sign out
-    </button>
+  // The rail's live counts, now a strip at the top of the board content.
+  const summary = (
+    <div className="flex gap-6 overflow-x-auto rounded-sm border border-subtle bg-card px-4 py-3">
+      <Count label="Past target" value={pastTarget} alert />
+      <Count label="Unassigned" value={needsYouNow.length} />
+      <Count label="Artisan out" value={artisanOut.length} />
+      <Count label="Finished" value={finished.length} />
+      <div className="ml-auto shrink-0 self-center">
+        <RailClock />
+      </div>
+    </div>
   )
 
   if (!wide) {
     const shown = lanes.find((l) => l.key === lane) ?? lanes[0]
 
     return (
-      <div className="min-h-dvh bg-bg">
-        <header className="bg-ink px-4 py-4 text-surface">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <p className="truncate text-sm text-surface/60">
-                {estate.data?.name ?? ' '}
-              </p>
-              <h1 className="mt-0.5 truncate text-lg">{profile?.full_name}</h1>
-            </div>
-            <div className="flex shrink-0 items-center gap-3">
-              <RailClock />
-              {signOutButton(false)}
-            </div>
-          </div>
+      <div className="p-4">
+        {summary}
 
-          {/* Four counts on a narrow screen: scroll them rather than wrap
-              them into an unreadable grid. */}
-          <div className="mt-3 flex gap-6 overflow-x-auto pb-1">{counts}</div>
-        </header>
-
-        <main className="p-4">
-          <div className="flex rounded-sm border border-line bg-surface">
-            {lanes.map((option) => (
-              <button
-                key={option.key}
-                type="button"
-                onClick={() => setLane(option.key)}
-                aria-pressed={option.key === lane}
-                className={`grow border-b-2 px-2 py-2.5 text-sm ${
-                  option.key === lane
-                    ? 'border-primary text-primary'
-                    : 'border-transparent text-ink-soft'
-                }`}
-              >
-                <span className="block truncate">{option.title}</span>
-                <span className="num text-xs">{option.issues.length}</span>
-              </button>
-            ))}
-          </div>
-
-          <div className="mt-4">
-            <Lane
-              title={shown.title}
-              count={shown.issues.length}
-              alert={shown.alert}
+        <div className="mt-4 flex rounded-sm border border-subtle bg-card">
+          {lanes.map((option) => (
+            <button
+              key={option.key}
+              type="button"
+              onClick={() => setLane(option.key)}
+              aria-pressed={option.key === lane}
+              className={`grow border-b-2 px-2 py-2.5 text-sm ${
+                option.key === lane
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-foreground-muted'
+              }`}
             >
-              {shown.issues.map(render)}
-            </Lane>
-          </div>
-        </main>
+              <span className="block truncate">{option.title}</span>
+              <span className="num text-xs">{option.issues.length}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-4">
+          <Lane title={shown.title} count={shown.issues.length} alert={shown.alert}>
+            {shown.issues.map(render)}
+          </Lane>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="flex min-h-dvh bg-bg">
-      <aside className="w-60 shrink-0 bg-ink px-5 py-6 text-surface">
-        <p className="text-sm text-surface/60">{estate.data?.name ?? ' '}</p>
-        <h1 className="mt-1 text-lg">{profile?.full_name}</h1>
+    <div className="p-6">
+      {summary}
 
-        <div className="mt-6">
-          <RailClock />
-        </div>
-
-        <div className="mt-5">{counts}</div>
-
-        <div className="mt-6">{signOutButton(true)}</div>
-      </aside>
-
-      <main className="grid grow grid-cols-3 gap-6 p-6">
+      <div className="mt-6 grid grid-cols-3 gap-6">
         {lanes.map((option) => (
           <Lane
             key={option.key}
@@ -311,7 +244,7 @@ export default function Board() {
             {option.issues.map(render)}
           </Lane>
         ))}
-      </main>
+      </div>
     </div>
   )
 }

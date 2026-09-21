@@ -7,7 +7,7 @@ import type { Priority, Unit } from '../../lib/issues'
 import { CATEGORIES, PRIORITY_CHOICES, PRIORITY_HELP } from './language'
 
 const field =
-  'mt-1.5 w-full rounded-sm border border-line bg-surface px-3 py-2.5 outline-none focus:border-primary'
+  'mt-1.5 w-full rounded-sm border border-subtle bg-card px-3 py-2.5 outline-none focus:border-primary'
 
 export default function ReportForm({ onLogged }: { onLogged: () => void }) {
   const { profile } = useAuth()
@@ -108,19 +108,19 @@ export default function ReportForm({ onLogged }: { onLogged: () => void }) {
                 aria-pressed={chosen}
                 className={`rounded-sm border px-3 py-2.5 text-left ${
                   chosen
-                    ? 'border-primary bg-sunk text-primary'
-                    : 'border-line bg-surface text-ink'
+                    ? 'border-primary bg-surface-2 text-primary'
+                    : 'border-subtle bg-card text-foreground'
                 }`}
               >
                 <span className="block font-medium">{choice.label}</span>
-                <span className="num mt-0.5 block text-xs text-ink-soft">
+                <span className="mt-0.5 block text-xs text-foreground-muted">
                   {choice.target}
                 </span>
               </button>
             )
           })}
         </div>
-        <p className="mt-2 text-xs text-ink-soft">{PRIORITY_HELP}</p>
+        <p className="mt-2 text-xs text-foreground-muted">{PRIORITY_HELP}</p>
       </fieldset>
 
       <label className="block">
@@ -146,7 +146,7 @@ export default function ReportForm({ onLogged }: { onLogged: () => void }) {
         />
       </label>
 
-      <label className="flex items-start gap-2.5 rounded-sm border border-line bg-sunk px-3 py-3">
+      <label className="flex items-start gap-2.5 rounded-sm border border-subtle bg-surface-2 px-3 py-3">
         <input
           type="checkbox"
           checked={access}
@@ -161,7 +161,7 @@ export default function ReportForm({ onLogged }: { onLogged: () => void }) {
       {log.isError && (
         <p
           role="alert"
-          className="rounded-sm border border-red/35 bg-red-bg px-3 py-2 text-sm text-red"
+          className="rounded-sm border border-destructive/35 bg-destructive-soft px-3 py-2 text-sm text-destructive"
         >
           {(log.error as Error).message}
         </p>
@@ -170,7 +170,7 @@ export default function ReportForm({ onLogged }: { onLogged: () => void }) {
       <button
         type="submit"
         disabled={log.isPending || !chosenUnit}
-        className="w-full rounded-sm bg-primary px-4 py-3 font-medium text-surface hover:bg-primary-dark disabled:opacity-60"
+        className="w-full rounded-sm bg-primary px-4 py-3 font-medium text-primary-foreground hover:bg-primary-hover disabled:opacity-60"
       >
         {log.isPending ? 'Sending…' : 'Send to the estate office'}
       </button>

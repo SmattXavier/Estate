@@ -30,14 +30,14 @@ export default function Timeline({
   if (!updates.data?.length) return null
 
   return (
-    <ol className="mt-4 border-l border-line pl-4">
+    <ol className="mt-4 border-l border-subtle pl-4">
       {updates.data.map((update) => (
         <li key={update.id} className="relative pb-3.5 last:pb-0">
-          <span className="absolute top-1.5 -left-[21px] h-2 w-2 rounded-sm border border-line-strong bg-surface" />
+          <span className="absolute top-1.5 -left-[21px] h-2 w-2 rounded-sm border border-strong bg-card" />
           <p className="text-sm">
             {translate ? translate(update) : update.body}
           </p>
-          <p className="mt-0.5 flex gap-3 text-xs text-ink-faint">
+          <p className="mt-0.5 flex gap-3 text-xs text-foreground-faint">
             <span>{update.author_name}</span>
             <span className="num">{timeOfDay(update.created_at)}</span>
           </p>

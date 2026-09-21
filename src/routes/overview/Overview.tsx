@@ -16,13 +16,13 @@ function Figure({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0 px-5 py-4">
       <p className="num text-2xl">{value}</p>
-      <p className="mt-0.5 text-xs text-ink-soft">{label}</p>
+      <p className="mt-0.5 text-xs text-foreground-muted">{label}</p>
     </div>
   )
 }
 
 export default function Overview() {
-  const { profile, signOut } = useAuth()
+  const { profile } = useAuth()
 
   const issues = useQuery({
     queryKey: OVERVIEW_ISSUES_KEY,
@@ -38,20 +38,6 @@ export default function Overview() {
     },
     enabled: !!profile,
     refetchInterval: 15_000,
-  })
-
-  const estate = useQuery({
-    queryKey: ['estate', profile?.estate_id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('estates')
-        .select('name')
-        .eq('id', profile!.estate_id)
-        .maybeSingle()
-      if (error) throw error
-      return data
-    },
-    enabled: !!profile,
   })
 
   const all = issues.data ?? []
@@ -84,31 +70,21 @@ export default function Overview() {
     : '—'
 
   return (
-    <main className="min-h-dvh bg-bg text-ink">
-      <header className="bg-ink text-surface">
-        <div className="mx-auto flex w-full max-w-5xl items-start justify-between gap-6 px-4 py-6 sm:px-6">
-          <div>
-            <p className="text-sm text-surface/60">{estate.data?.name ?? ' '}</p>
-            <h1 className="mt-1 text-xl">{profile?.full_name}</h1>
-            <p className="mt-2 max-w-xl text-sm text-surface/70">
-              Alerts appear here only when an issue passes its target with
-              nobody assigned to it.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => void signOut()}
-            className="shrink-0 text-sm text-surface/70 underline underline-offset-4 hover:text-surface"
-          >
-            Sign out
-          </button>
-        </div>
-      </header>
+    <div>
+      <div className="px-4 pt-6 sm:px-6">
+        <h1 className="text-xl">Overview</h1>
+        <p className="mt-1 max-w-xl text-sm text-foreground-muted">
+          Alerts appear here only when an issue passes its target with nobody
+          assigned to it.
+        </p>
+      </div>
 
-      <AlertPanel issues={all} />
+      <div className="mt-5">
+        <AlertPanel issues={all} />
+      </div>
 
-      <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6">
-        <div className="grid grid-cols-2 divide-x divide-y divide-line rounded-sm border border-line bg-surface md:grid-cols-4 md:divide-y-0">
+      <div className="w-full px-4 py-5 sm:px-6">
+        <div className="grid grid-cols-2 divide-x divide-y divide-subtle rounded-sm border border-subtle bg-card md:grid-cols-4 md:divide-y-0">
           <Figure label="Open issues" value={String(open)} />
           <Figure label="Past target now" value={String(pastTarget)} />
           <Figure label="Average time to assign" value={averageToAssign} />
@@ -118,7 +94,7 @@ export default function Overview() {
         {issues.isError && (
           <p
             role="alert"
-            className="mt-6 rounded-sm border border-red/35 bg-red-bg px-3 py-2 text-sm text-red"
+            className="mt-6 rounded-sm border border-destructive/35 bg-destructive-soft px-3 py-2 text-sm text-destructive"
           >
             {(issues.error as Error).message}
           </p>
@@ -128,6 +104,6 @@ export default function Overview() {
           <IssueTable issues={all} />
         </div>
       </div>
-    </main>
+    </div>
   )
 }

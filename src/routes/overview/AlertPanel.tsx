@@ -35,7 +35,7 @@ function ChaseButton({ issue, now }: { issue: BoardIssue; now: number }) {
       <button
         type="button"
         disabled
-        className="w-full shrink-0 rounded-sm border border-surface/30 px-3 py-1.5 text-sm text-surface/60 md:w-auto"
+        className="w-full shrink-0 rounded-sm border border-destructive-on-surface/30 px-3 py-1.5 text-sm text-destructive-on-surface/60 md:w-auto"
       >
         Chased{' '}
         <span className="num">
@@ -52,12 +52,12 @@ function ChaseButton({ issue, now }: { issue: BoardIssue; now: number }) {
         type="button"
         onClick={() => chase.mutate()}
         disabled={chase.isPending}
-        className="w-full rounded-sm border border-surface bg-surface px-3 py-1.5 text-sm font-medium text-red hover:bg-transparent hover:text-surface disabled:opacity-60 md:w-auto"
+        className="w-full rounded-sm border border-destructive-on-surface bg-destructive-on-surface px-3 py-1.5 text-sm font-medium text-destructive-surface hover:bg-transparent hover:text-destructive-on-surface disabled:opacity-60 md:w-auto"
       >
         {chase.isPending ? 'Chasing…' : 'Chase the manager'}
       </button>
       {chase.isError && (
-        <p role="alert" className="mt-1 text-xs text-surface/85">
+        <p role="alert" className="mt-1 text-xs text-destructive-on-surface/85">
           {(chase.error as Error).message}
         </p>
       )}
@@ -68,16 +68,16 @@ function ChaseButton({ issue, now }: { issue: BoardIssue; now: number }) {
 /** Two lines: what it is, then what it is called and how late it is. */
 function Row({ issue, now }: { issue: BoardIssue; now: number }) {
   return (
-    <li className="flex flex-col gap-2 border-t border-surface/20 py-2 md:flex-row md:items-center md:justify-between md:gap-6">
+    <li className="flex flex-col gap-2 border-t border-destructive-on-surface/20 py-2 md:flex-row md:items-center md:justify-between md:gap-6">
       <div className="min-w-0">
-        <p className="flex gap-3 text-xs text-surface/70">
+        <p className="flex gap-3 text-xs text-destructive-on-surface/70">
           <span className="num">{issue.ref}</span>
           <span>{issue.unit?.label ?? 'Unknown unit'}</span>
           <span>{issue.priority}</span>
         </p>
         <p className="mt-0.5 flex items-baseline gap-3">
           <span className="min-w-0 truncate">{issue.title}</span>
-          <span className="num shrink-0 text-sm text-surface/85">
+          <span className="num shrink-0 text-sm text-destructive-on-surface/85">
             {countdownLabel(windowLeft(issue, now).remaining)} target
           </span>
         </p>
@@ -104,8 +104,8 @@ export default function AlertPanel({ issues }: { issues: BoardIssue[] }) {
   if (alerts.length === 0) return null
 
   return (
-    <section className="bg-red text-surface">
-      <div className="mx-auto w-full max-w-5xl px-4 py-3 sm:px-6">
+    <section className="bg-destructive-surface text-destructive-on-surface shadow-e2">
+      <div className="w-full px-4 py-3 sm:px-6">
         <h2 className="text-base">
           {alerts.length === 1
             ? '1 issue has passed its target with nobody assigned'

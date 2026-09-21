@@ -1,63 +1,141 @@
-@import url('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&display=swap');
+/* Two authored modes. Dark is not a filter over light: every value below is
+   chosen for its own mode. Utility names are mapped onto these in index.css.
 
-/* The design layer. Every screen reads from here; no screen hardcodes a
-   colour. Utility names (bg-primary, text-ink-soft, border-line) are mapped
-   onto these variables in index.css. */
+   Naming: raw tokens live here, Tailwind-facing names live in index.css. The
+   split is what lets a token change per mode — a value baked into @theme
+   could not. */
 
 :root {
-  --ink: #14232B;
-  --ink-soft: #56696E;
-  --ink-faint: #8698A0;
+  color-scheme: light;
 
-  --line: #D6DEDC;
-  --line-strong: #B6C3C1;
+  --background: #F2F5F5;
+  --foreground: #14232B;
+  --foreground-muted: #55686D;
+  --foreground-faint: #83959C;
 
-  --surface: #FFFFFF;
-  --sunk: #F3F6F5;
-  --bg: #EAEEED;
+  --card: #FFFFFF;
+  --surface-2: #F4F7F6;
+  --surface-3: #E8EDEC;
 
+  --border-subtle: #DCE3E2;
+  --border-strong: #B9C5C3;
+
+  /* The dark band, and in Stage B the sidebar. */
+  --shell: #14232B;
+  --shell-foreground: #FFFFFF;
+
+  /* Teal is for actions only. Status blue is --info. */
   --primary: #0E5A6E;
-  --primary-dark: #0A4353;
+  --primary-hover: #0A4353;
+  --primary-foreground: #FFFFFF;
 
-  --amber: #A9761B;
-  --red: #A62A1F;
-  --green: #2F6E4F;
+  --success: #2F6E4F;
+  --success-soft: #E6F0EA;
+  --warning: #A9761B;
+  --warning-soft: #FBF2DE;
+  --info: #1F5E86;
+  --info-soft: #E4EEF5;
+  --destructive: #A62A1F;
+  --destructive-soft: #FAE9E7;
+  --destructive-foreground: #FFFFFF;
 
-  --amber-bg: #FBF2DE;
-  --red-bg: #FAE9E7;
-  --green-bg: #E6F0EA;
+  /* The CEO alert band. A red tuned to be legible as *text* on a dark card
+     is far too loud as a full-bleed panel, so the surface is its own pair. */
+  --destructive-surface: #A62A1F;
+  --destructive-on-surface: #FFFFFF;
 
-  /* 3px everywhere. Emphasis never comes from a larger radius. */
+  --shadow-e1: 0 1px 2px rgb(20 35 43 / 0.06), 0 1px 1px rgb(20 35 43 / 0.04);
+  --shadow-e2: 0 2px 6px rgb(20 35 43 / 0.08), 0 1px 2px rgb(20 35 43 / 0.05);
+  --shadow-e3: 0 8px 24px rgb(20 35 43 / 0.12), 0 2px 6px rgb(20 35 43 / 0.07);
+
+  --motion-fast: 120ms;
+  --motion-base: 200ms;
+  --motion-slow: 1000ms;
+
+  /* 3px everywhere, unchanged by this stage. */
   --radius: 3px;
 
-  --font: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+  --font-sans-stack: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono-stack: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
 }
 
-/* These are element defaults, so they belong in the same layer as Tailwind's
-   preflight. Unlayered they would outrank every utility — `button { color }`
-   below would silently beat `text-red` on any button in the app. Layer order
-   is declared by Tailwind in index.css; naming `base` here appends to it. */
+.dark {
+  color-scheme: dark;
+
+  /* Graphite: a neutral base, so the only colour on screen is colour that
+     carries meaning. Nothing here is tinted toward the teal accent. */
+  --background: #111214;
+  --foreground: #ECECEE;
+  --foreground-muted: #A1A3A9;
+  /* Lifted from the spec's #84878F, which reached only 4.37:1 on
+     --surface-2 (the expanded CEO row). #888B93 measures 4.61:1 there. */
+  --foreground-faint: #888B93;
+
+  --card: #1A1B1E;
+  --surface-2: #222327;
+  --surface-3: #2A2C30;
+
+  --border-subtle: #2C2E33;
+  --border-strong: #3D4046;
+
+  /* Deeper than the page, so the band still reads as a band on dark. */
+  --shell: #0B0B0D;
+  --shell-foreground: #E4E4E7;
+
+  /* Lifted: the light-mode teal is unreadable on a dark ground. */
+  --primary: #3FA3BD;
+  --primary-hover: #57B6CE;
+  --primary-foreground: #06212A;
+
+  --success: #5FBE8C;
+  --success-soft: #15271E;
+  --warning: #E0A94A;
+  --warning-soft: #2E2512;
+  --info: #6BB3DE;
+  --info-soft: #16242F;
+  --destructive: #F07167;
+  --destructive-soft: #33191A;
+  --destructive-foreground: #10181B;
+
+  --destructive-surface: #451A17;
+  --destructive-on-surface: #F8DCD7;
+
+  /* Elevation barely reads on dark, so the shadow goes near-black. */
+  --shadow-e1: 0 1px 2px rgb(0 0 0 / 0.55);
+  --shadow-e2: 0 2px 8px rgb(0 0 0 / 0.60);
+  --shadow-e3: 0 12px 32px rgb(0 0 0 / 0.70);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 1ms;
+    --motion-base: 1ms;
+    --motion-slow: 1ms;
+  }
+}
+
 @layer base {
   html {
-    background: var(--bg);
+    background: var(--background);
   }
 
   body {
     margin: 0;
-    font-family: var(--font);
+    font-family: var(--font-sans-stack);
     font-size: 15px;
     line-height: 1.5;
     font-weight: 400;
-    color: var(--ink);
+    color: var(--foreground);
     -webkit-font-smoothing: antialiased;
   }
 
+  /* No font-stretch: IBM Plex Sans has no width axis, and asking for one
+     only invites synthetic stretching. Weight and tracking carry it. */
   h1,
   h2,
   h3,
   h4 {
-    font-stretch: 118%;
-    font-weight: 700;
+    font-weight: 600;
     letter-spacing: -0.015em;
     margin: 0;
   }
@@ -71,8 +149,9 @@
   }
 }
 
-/* Every ref, clock, countdown and money figure. Digits must not jitter as
-   they tick. */
+/* Every ref, clock, countdown, count and money figure. */
 .num {
+  font-family: var(--font-mono-stack);
   font-variant-numeric: tabular-nums;
+  font-feature-settings: 'zero' 1;
 }

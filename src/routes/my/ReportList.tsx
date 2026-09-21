@@ -20,7 +20,7 @@ function Card({ issue }: { issue: Issue }) {
 
   return (
     <li
-      className={`rounded-sm border border-line border-l-4 bg-surface ${TONE_BORDER[tone]}`}
+      className={`rounded-sm border border-subtle border-l-4 bg-card ${TONE_BORDER[tone]}`}
     >
       <button
         type="button"
@@ -33,13 +33,13 @@ function Card({ issue }: { issue: Issue }) {
             colour, and the countdown bar carries the urgency. */}
         <h3 className="text-base">{issue.title}</h3>
 
-        <p className="mt-1 flex gap-3 text-xs text-ink-faint">
+        <p className="mt-1 flex gap-3 text-xs text-foreground-faint">
           <span className="num">{issue.ref}</span>
           <span>{issue.unit?.label ?? 'Your flat'}</span>
         </p>
 
-        <p className="mt-2 text-sm text-ink-soft">{statusLine(issue, now)}</p>
-        <p className="mt-0.5 text-sm text-ink-faint">
+        <p className="mt-2 text-sm text-foreground-muted">{statusLine(issue, now)}</p>
+        <p className="mt-0.5 text-sm text-foreground-faint">
           {reportedLine(issue, now)}
         </p>
 
@@ -47,7 +47,7 @@ function Card({ issue }: { issue: Issue }) {
       </button>
 
       {open && (
-        <div className="border-t border-line px-4 py-3.5">
+        <div className="border-t border-subtle px-4 py-3.5">
           <p className="text-sm">{issue.description}</p>
           <Timeline issueId={issue.id} translate={timelineBody} />
         </div>
@@ -59,14 +59,14 @@ function Card({ issue }: { issue: Issue }) {
 export default function ReportList({ issues }: { issues: Issue[] }) {
   if (!issues.length) {
     return (
-      <p className="px-5 py-10 text-center text-sm text-ink-soft">
+      <p className="rounded-sm border border-subtle bg-card px-5 py-10 text-center text-sm text-foreground-muted">
         You have not told us about anything yet.
       </p>
     )
   }
 
   return (
-    <ul className="space-y-3 px-5 py-6">
+    <ul className="space-y-3">
       {issues.map((issue) => (
         <Card key={issue.id} issue={issue} />
       ))}

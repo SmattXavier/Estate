@@ -50,30 +50,31 @@ export type Clocked = {
 export const BOARD_ISSUES_KEY = ['board-issues']
 export const OVERVIEW_ISSUES_KEY = ['overview-issues']
 
-export type Tone = 'green' | 'amber' | 'red' | 'primary' | 'grey'
+/** Semantic, matching the token families. Assigned is info blue (STATES.md). */
+export type Tone = 'success' | 'warning' | 'destructive' | 'info' | 'neutral'
 
 export const TONE_BORDER: Record<Tone, string> = {
-  green: 'border-l-green',
-  amber: 'border-l-amber',
-  red: 'border-l-red',
-  primary: 'border-l-primary',
-  grey: 'border-l-line-strong',
+  success: 'border-l-success',
+  warning: 'border-l-warning',
+  destructive: 'border-l-destructive',
+  info: 'border-l-info',
+  neutral: 'border-l-strong',
 }
 
 export const TONE_CHIP: Record<Tone, string> = {
-  green: 'border-green/35 bg-green-bg text-green',
-  amber: 'border-amber/35 bg-amber-bg text-amber',
-  red: 'border-red/35 bg-red-bg text-red',
-  primary: 'border-primary/30 bg-sunk text-primary',
-  grey: 'border-line bg-sunk text-ink-soft',
+  success: 'border-success/35 bg-success-soft text-success',
+  warning: 'border-warning/35 bg-warning-soft text-warning',
+  destructive: 'border-destructive/35 bg-destructive-soft text-destructive',
+  info: 'border-info/35 bg-info-soft text-info',
+  neutral: 'border-subtle bg-surface-2 text-foreground-muted',
 }
 
 export const TONE_FILL: Record<Tone, string> = {
-  green: 'bg-green',
-  amber: 'bg-amber',
-  red: 'bg-red',
-  primary: 'bg-primary',
-  grey: 'bg-line-strong',
+  success: 'bg-success',
+  warning: 'bg-warning',
+  destructive: 'bg-destructive',
+  info: 'bg-info',
+  neutral: 'bg-strong',
 }
 
 /**
@@ -94,9 +95,9 @@ export function isPastTarget(issue: Clocked, now: number): boolean {
 }
 
 export function countdownTone(remaining: number, fraction: number): Tone {
-  if (remaining <= 0) return 'red'
-  if (fraction < 0.25) return 'amber'
-  return 'green'
+  if (remaining <= 0) return 'destructive'
+  if (fraction < 0.25) return 'warning'
+  return 'success'
 }
 
 export function cardTone(issue: Clocked, now: number): Tone {
@@ -104,9 +105,9 @@ export function cardTone(issue: Clocked, now: number): Tone {
     const { remaining, fraction } = windowLeft(issue, now)
     return countdownTone(remaining, fraction)
   }
-  if (issue.status === 'assigned') return 'primary'
-  if (issue.status === 'resolved') return 'green'
-  return 'grey'
+  if (issue.status === 'assigned') return 'info'
+  if (issue.status === 'resolved') return 'success'
+  return 'neutral'
 }
 
 function plural(n: number, word: string) {

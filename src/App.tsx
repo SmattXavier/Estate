@@ -2,21 +2,23 @@ import type { ReactNode } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { useAuth } from './auth/context'
 import type { Role } from './auth/context'
+import Shell from './shell/Shell'
 import SignIn from './routes/SignIn'
-import MyIssues from './routes/my/MyIssues'
+import NewReport from './routes/my/NewReport'
+import MyReports from './routes/my/MyReports'
 import Board from './routes/board/Board'
 import ArtisanDirectory from './routes/board/ArtisanDirectory'
 import Overview from './routes/overview/Overview'
 
 const HOME: Record<Role, string> = {
-  resident: '/my',
+  resident: '/my/reports',
   facility_manager: '/board',
   ceo: '/overview',
 }
 
 function Waiting() {
   return (
-    <div className="min-h-dvh bg-bg px-6 py-16 text-center text-sm text-ink-soft">
+    <div className="min-h-dvh bg-background px-6 py-16 text-center text-sm text-foreground-muted">
       One moment…
     </div>
   )
@@ -29,7 +31,7 @@ function RequireRole({ role, children }: { role: Role; children: ReactNode }) {
   if (loading) return <Waiting />
   if (!profile) return <Navigate to="/" replace />
   if (profile.role !== role) return <Navigate to={HOME[profile.role]} replace />
-  return children
+  return <Shell>{children}</Shell>
 }
 
 function Landing() {
@@ -44,19 +46,38 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
+
+      <Route path="/my" element={<Navigate to="/my/reports" replace />} />
       <Route
-        path="/my"
+        path="/my/new"
         element={
           <RequireRole role="resident">
-            <MyIssues />
+            <NewReport />
           </RequireRole>
         }
       />
+      <Route
+        path="/my/reports"
+        element={
+          <RequireRole role="resident">
+            <MyReports />
+          </RequireRole>
+        }
+      />
+
       <Route
         path="/board"
         element={
           <RequireRole role="facility_manager">
             <Board />
+          </RequireRole>
+        }
+      />
+      <Route
+        path="/board/artisans"
+        element={
+          <RequireRole role="facility_manager">
+            <ArtisanDirectory />
           </RequireRole>
         }
       />
@@ -68,6 +89,7 @@ export default function App() {
           </RequireRole>
         }
       />
+
       <Route
         path="/overview"
         element={
@@ -76,6 +98,7 @@ export default function App() {
           </RequireRole>
         }
       />
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

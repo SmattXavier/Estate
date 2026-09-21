@@ -34,7 +34,7 @@ function chipLabel(issue: BoardIssue): string {
 function Detail({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="text-xs text-ink-faint">{label}</dt>
+      <dt className="text-xs text-foreground-faint">{label}</dt>
       <dd className="mt-0.5">{value}</dd>
     </div>
   )
@@ -73,21 +73,21 @@ function DispatchForm({
   })
 
   return (
-    <div className="mt-4 border-t border-line pt-3">
+    <div className="mt-4 border-t border-subtle pt-3">
       <label className="block text-sm font-medium">
         Reply to the resident
         <textarea
           rows={3}
           value={reply}
           onChange={(event) => setReply(event.target.value)}
-          className="mt-1.5 w-full resize-none rounded-sm border border-line bg-surface px-3 py-2 font-normal outline-none focus:border-primary"
+          className="mt-1.5 w-full resize-none rounded-sm border border-subtle bg-card px-3 py-2 font-normal outline-none focus:border-primary"
         />
       </label>
 
       {dispatch.isError && (
         <p
           role="alert"
-          className="mt-2 rounded-sm border border-red/35 bg-red-bg px-3 py-2 text-sm text-red"
+          className="mt-2 rounded-sm border border-destructive/35 bg-destructive-soft px-3 py-2 text-sm text-destructive"
         >
           {(dispatch.error as Error).message}
         </p>
@@ -98,14 +98,14 @@ function DispatchForm({
           type="button"
           onClick={() => dispatch.mutate()}
           disabled={!reply.trim() || dispatch.isPending}
-          className="grow rounded-sm bg-primary px-4 py-2.5 text-sm font-medium text-surface hover:bg-primary-dark disabled:opacity-60"
+          className="grow rounded-sm bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary-hover disabled:opacity-60"
         >
           {dispatch.isPending ? 'Dispatching…' : 'Confirm dispatch'}
         </button>
         <button
           type="button"
           onClick={onRechoose}
-          className="rounded-sm border border-line px-3 py-2.5 text-sm hover:border-primary hover:text-primary"
+          className="rounded-sm border border-subtle px-3 py-2.5 text-sm hover:border-primary hover:text-primary"
         >
           Someone else
         </button>
@@ -138,12 +138,12 @@ export default function IssueCard({
   // An escalated issue is red regardless of where the countdown got to.
   const tone: Tone =
     issue.escalated_at && issue.status === 'submitted'
-      ? 'red'
+      ? 'destructive'
       : cardTone(issue, now)
 
   return (
     <li
-      className={`rounded-sm border border-line border-l-4 bg-surface ${TONE_BORDER[tone]}`}
+      className={`rounded-sm border border-subtle border-l-4 bg-card ${TONE_BORDER[tone]}`}
     >
       <button
         type="button"
@@ -152,7 +152,7 @@ export default function IssueCard({
         className="w-full px-3.5 py-3 text-left"
       >
         <div className="flex items-start justify-between gap-3">
-          <span className="num text-xs text-ink-faint">{issue.ref}</span>
+          <span className="num text-xs text-foreground-faint">{issue.ref}</span>
           <span
             className={`shrink-0 rounded-sm border px-1.5 py-0.5 text-xs ${TONE_CHIP[tone]}`}
           >
@@ -162,7 +162,7 @@ export default function IssueCard({
 
         <h3 className="mt-1 text-base">{issue.title}</h3>
 
-        <p className="mt-1 flex gap-3 text-xs text-ink-soft">
+        <p className="mt-1 flex gap-3 text-xs text-foreground-muted">
           <span>{issue.unit?.label ?? 'Unknown unit'}</span>
           <span>{issue.category}</span>
         </p>
@@ -170,14 +170,14 @@ export default function IssueCard({
         {issue.status === 'submitted' && <CountdownBar issue={issue} />}
 
         {issue.nudged_at && (
-          <p className="mt-2.5 border-t border-red/25 pt-2 text-sm text-red">
+          <p className="mt-2.5 border-t border-destructive/25 pt-2 text-sm text-destructive">
             The CEO has asked about this one.
           </p>
         )}
       </button>
 
       {expanded && (
-        <div className="border-t border-line px-3.5 py-3">
+        <div className="border-t border-subtle px-3.5 py-3">
           <dl className="grid grid-cols-2 gap-3 text-sm">
             <Detail
               label="Resident"
@@ -200,7 +200,7 @@ export default function IssueCard({
             )}
           </dl>
 
-          <p className="mt-3 border-t border-line pt-3 text-sm">
+          <p className="mt-3 border-t border-subtle pt-3 text-sm">
             {issue.description}
           </p>
 
@@ -210,7 +210,7 @@ export default function IssueCard({
             <button
               type="button"
               onClick={() => navigate(`/board/artisans/${issue.id}`)}
-              className="mt-4 w-full rounded-sm bg-primary px-4 py-2.5 text-sm font-medium text-surface hover:bg-primary-dark"
+              className="mt-4 w-full rounded-sm bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary-hover"
             >
               Choose an artisan
             </button>
