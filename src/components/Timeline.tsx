@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import { timeOfDay, type IssueUpdate } from '../lib/issues'
+import { ErrorNote } from './States'
 
 /**
  * The audit trail for one issue. `translate` lets the resident screen soften
@@ -26,6 +27,14 @@ export default function Timeline({
       return data ?? []
     },
   })
+
+  if (updates.isError) {
+    return (
+      <div className="mt-4">
+        <ErrorNote error={updates.error} what="We could not load the history." />
+      </div>
+    )
+  }
 
   if (!updates.data?.length) return null
 

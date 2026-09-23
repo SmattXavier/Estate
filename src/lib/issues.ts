@@ -124,10 +124,13 @@ export function gap(ms: number): string {
   return plural(Math.floor(hours / 24), 'day')
 }
 
-/** "14 min left", "3 hr 20 min left", "12 min past". */
+/** "14 min left", "3 hr 20 min left", "12 min past", "under a minute left". */
 export function countdownLabel(remaining: number): string {
   const past = remaining <= 0
   const total = Math.floor(Math.abs(remaining) / 60_000)
+  // "0 min" is never the truth: either the last minute is still running or
+  // the target has only just gone.
+  if (total === 0) return past ? 'under a minute past' : 'under a minute left'
   const hours = Math.floor(total / 60)
   const minutes = total % 60
   const clock = hours > 0 ? `${hours} hr ${minutes} min` : `${minutes} min`

@@ -2,6 +2,7 @@ import { Fragment, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import Timeline from '../../components/Timeline'
 import { useMediaQuery } from '../../lib/useMediaQuery'
+import { Empty } from '../../components/States'
 import {
   TONE_BORDER,
   TONE_CHIP,
@@ -51,7 +52,7 @@ function Cell({
   children: ReactNode
   className?: string
 }) {
-  return <td className={`px-3 py-2.5 align-top ${className}`}>{children}</td>
+  return <td className={`px-3 py-2 align-top ${className}`}>{children}</td>
 }
 
 function Expanded({ issue }: { issue: BoardIssue }) {
@@ -79,6 +80,15 @@ export default function IssueTable({ issues }: { issues: BoardIssue[] }) {
     const id = setInterval(() => setNow(Date.now()), 30_000)
     return () => clearInterval(id)
   }, [])
+
+  if (!issues.length) {
+    return (
+      <Empty>
+        No issues on this estate yet. Every fault a resident reports appears
+        here, newest first, with what it cost to put right.
+      </Empty>
+    )
+  }
 
   if (!wide) {
     return (

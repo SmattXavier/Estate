@@ -11,6 +11,7 @@ import {
 } from '../../lib/issues'
 import AlertPanel from './AlertPanel'
 import IssueTable from './IssueTable'
+import { ErrorNote, SkeletonList } from '../../components/States'
 
 function Figure({ label, value }: { label: string; value: string }) {
   return (
@@ -92,16 +93,20 @@ export default function Overview() {
         </div>
 
         {issues.isError && (
-          <p
-            role="alert"
-            className="mt-6 rounded-sm border border-destructive/35 bg-destructive-soft px-3 py-2 text-sm text-destructive"
-          >
-            {(issues.error as Error).message}
-          </p>
+          <div className="mt-6">
+            <ErrorNote
+              error={issues.error}
+              what="We could not load the estate's issues."
+            />
+          </div>
         )}
 
         <div className="mt-6">
-          <IssueTable issues={all} />
+          {issues.isPending ? (
+            <SkeletonList rows={4} />
+          ) : (
+            <IssueTable issues={all} />
+          )}
         </div>
       </div>
     </div>

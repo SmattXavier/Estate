@@ -149,7 +149,7 @@ export default function IssueCard({
         type="button"
         onClick={onToggle}
         aria-expanded={expanded}
-        className="w-full px-3.5 py-3 text-left"
+        className="w-full px-3.5 py-3 text-left lg:px-3 lg:py-2.5"
       >
         <div className="flex items-start justify-between gap-3">
           <span className="num text-xs text-foreground-faint">{issue.ref}</span>
@@ -160,9 +160,9 @@ export default function IssueCard({
           </span>
         </div>
 
-        <h3 className="mt-1 text-base">{issue.title}</h3>
+        <h3 className="mt-0.5 text-base">{issue.title}</h3>
 
-        <p className="mt-1 flex gap-3 text-xs text-foreground-muted">
+        <p className="mt-0.5 flex gap-3 text-xs text-foreground-muted">
           <span>{issue.unit?.label ?? 'Unknown unit'}</span>
           <span>{issue.category}</span>
         </p>
@@ -177,8 +177,8 @@ export default function IssueCard({
       </button>
 
       {expanded && (
-        <div className="border-t border-subtle px-3.5 py-3">
-          <dl className="grid grid-cols-2 gap-3 text-sm">
+        <div className="border-t border-subtle px-3.5 py-3 lg:px-3 lg:py-2.5">
+          <dl className="grid grid-cols-2 gap-2.5 text-sm">
             <Detail
               label="Resident"
               value={issue.reporter?.full_name ?? 'Unknown'}

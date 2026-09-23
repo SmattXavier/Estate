@@ -20,8 +20,24 @@ Demo estate: Wuse II Estate, Abuja. Currency ₦. Timezone Africa/Lagos.
 
 ## Stack
 
-React 18 + Vite 5 + TypeScript 5, Tailwind v4, TanStack Query, React Router,
-Supabase (Postgres, Auth, RLS, pg_cron). Vercel for hosting.
+React 19.2.8 + Vite 8.2.2 + TypeScript 6.0.3, Tailwind v4.3.3, TanStack
+Query 5, React Router 7, Supabase (Postgres, Auth, RLS, pg_cron). Vercel for
+hosting. Build against what is installed, not against these numbers once they
+drift — but fix the line when they do.
+
+**Tailwind is CSS-first. There is no `tailwind.config.js` and there should not
+be one.** The theme is declared in CSS: raw token values in `src/theme.css`,
+mapped onto utility names by `@theme inline` in `src/index.css`.
+
+**The dark variant is `@custom-variant`, not `darkMode: 'class'`.**
+`darkMode` is Tailwind v3 configuration and has nowhere to live here. The
+equivalent sits at the top of `src/index.css`:
+
+```css
+@custom-variant dark (&:where(.dark, .dark *));
+```
+
+Same behaviour — `class="dark"` on `<html>` — declared in CSS.
 
 ## The schema is finished. Do not change it.
 
@@ -97,28 +113,102 @@ Never hardcode these in the frontend. Read `sla_due_at` off the row.
 
 Three genuinely different screens, not one dashboard with a role switch.
 
-- **Resident** — responsive. Below 768px, a single column with two tabs,
-  "Report a fault" and "Your reports". At 768px and above, both side by side
-  inside a container capped at 1100px and centred, and there are no tabs at
-  all — the desktop layout does not render them. Plain language at every
-  width. Never the words "SLA", "ticket", "escalate", "dispatch". Say
-  "someone is coming".
+- **Resident** — two routes, each a full page inside the shell.
+  `/my/new` is the report form alone; `/my/reports` is the list alone, with
+  its expand-in-place timeline. `/my` redirects to `/my/reports`. Submitting
+  navigates to `/my/reports` with the new report highlighted — the id rides
+  in location state, and the highlight expires with the report's own age.
+  There are no tabs and no two-column layout. Plain language at every width.
+  Never the words "SLA", "ticket", "escalate", "dispatch". Say "someone is
+  coming".
 - **Facility manager** — dense three-lane board, desktop-first: *Needs you
   now* (submitted, least time left first) / *Artisan out* (assigned) /
-  *Finished* (resolved + closed). The artisan directory is a separate route
-  reached from an issue, and it returns to that issue afterwards.
+  *Finished* (resolved + closed). From 1024px the three lanes scroll
+  independently so a long queue in one does not push the others off screen.
+  The artisan directory is a separate route: reached from an issue at
+  `/board/artisans/:issueId` it returns to that issue afterwards, and reached
+  from the sidebar at `/board/artisans` it is a browse-only roster with no
+  dispatch button.
 - **CEO** — quiet. Red alert band only when `escalated_at is not null and
   status = 'submitted'`. Four numbers, then the full table, then export.
 
 Routing after sign-in, by `profiles.role`:
-`resident → /my`, `facility_manager → /board`, `ceo → /overview`.
+`resident → /my/reports`, `facility_manager → /board`, `ceo → /overview`.
 Any signed-out visit lands on `/`.
 
-## Style
+## Visual direction
 
-Tailwind v4. No component library beyond what is already installed. Colours:
-ink `#14232B`, primary `#0E5A6E`, amber `#A9761B`, red `#A62A1F`, green
-`#2F6E4F`, line `#D6DEDC`. Tabular numerals on every clock and countdown.
+Tailwind v4, no component library beyond what is already installed.
+
+### The shell
+
+Every signed-in route renders inside one shared layout, `src/shell/Shell.tsx`.
+From 1024px it is a fixed 240px sidebar: estate name at the top, role-specific
+nav links with a rail marking the current page, and at the bottom the theme
+toggle, the signed-in person's name and role, and sign out. Content fills the
+rest of the viewport — the page itself is never a centred column, though wide
+content such as the CEO table may cap its own width. Below 1024px the sidebar
+becomes an off-canvas drawer opened from a slim top bar carrying the page
+title and a menu button.
+
+Navigation is declared once, in `src/shell/nav.ts`. A new screen adds an entry
+there and the sidebar, the drawer and the mobile title all follow.
+
+### Two authored modes
+
+Light and dark are authored independently in `src/theme.css` — dark is not a
+filter, inversion or opacity trick over light. Dark is a neutral graphite
+base, so the only colour on screen is colour that carries meaning.
+
+`class="dark"` on `<html>` selects the mode. The choice is saved in
+localStorage under `estate-theme`; with nothing saved, `prefers-color-scheme`
+decides. An inline script in `index.html` applies it before first paint, so
+there is no flash of the wrong theme.
+
+### Tokens
+
+Raw values live in `theme.css`, once per mode; `index.css` maps them onto
+utility names.
+
+| Family | Tokens |
+|---|---|
+| Surfaces | `--background`, `--foreground` (+ `-muted`, `-faint`), `--card`, `--surface-2`, `--surface-3` |
+| Borders | `--border-subtle`, `--border-strong` |
+| Shell | `--shell`, `--shell-foreground` |
+| Brand | `--primary` (+ `-hover`, `-foreground`) — teal, for actions only |
+| Status | `--success`, `--warning`, `--info`, `--destructive`, each with a `-soft` background; plus `--destructive-surface` / `-on-surface` for the alert band |
+| Elevation | `--shadow-e1/e2/e3`, only on things that genuinely float |
+| Motion | `--motion-fast/base/slow`, all 1ms under `prefers-reduced-motion` |
+
+**No hex values and no raw Tailwind palette classes (`text-red-600`,
+`bg-emerald-50`) in components.** Status colour is carried by a 4px coloured
+left border plus a small bordered chip, never by tinting a whole card.
+Assigned is `--info` blue, per STATES.md — not the brand teal.
+
+### Type
+
+IBM Plex Sans (400/500/600) for everything, IBM Plex Mono (400/500) via the
+`.num` class for refs, clocks, countdowns, counts and money — the figure
+only, never the sentence around it.
+
+### Density
+
+Density varies by surface and by width. Resident screens are generous on a
+phone and comfortable on desktop; the board and CEO screens are comfortable
+and tap-safe on a phone and dense from 1024px. The 768–1023px band takes
+desktop text with roomier padding.
+
+Below 768px these are floors, not preferences:
+
+- form controls at 16px minimum, or iOS Safari force-zooms on focus
+- 44px minimum for anything tappable (a checkbox may keep its own size if its
+  label carries the target)
+- text no smaller than 13px — `--text-xs` is raised to `0.8125rem` under
+  768px so this holds for screens written later
+- sizes in `rem`, not `px`, so enlarged system text actually enlarges
+
+The countdown bar draining is the only animated thing in the app. Loading
+skeletons are deliberately still.
 
 ## Scope discipline
 

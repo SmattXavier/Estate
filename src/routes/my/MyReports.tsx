@@ -1,12 +1,17 @@
+import { useLocation } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../auth/context'
 import ReportList from './ReportList'
+import { ErrorNote, SkeletonList } from '../../components/States'
 import type { Issue } from '../../lib/issues'
 
 /** The list alone, as a page. */
 export default function MyReports() {
   const { profile } = useAuth()
+  const location = useLocation()
+  const highlightId =
+    (location.state as { highlight?: string } | null)?.highlight ?? null
 
   const issues = useQuery({
     queryKey: ['my-issues', profile?.id],
@@ -38,7 +43,16 @@ export default function MyReports() {
       </p>
 
       <div className="mt-5">
-        <ReportList issues={issues.data ?? []} />
+        {issues.isPending ? (
+          <SkeletonList />
+        ) : issues.isError ? (
+          <ErrorNote
+            error={issues.error}
+            what="We could not load your reports."
+          />
+        ) : (
+          <ReportList issues={issues.data ?? []} highlightId={highlightId} />
+        )}
       </div>
     </div>
   )

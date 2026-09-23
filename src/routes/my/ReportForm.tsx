@@ -4,12 +4,17 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../auth/context'
 import type { Priority, Unit } from '../../lib/issues'
+import { ErrorNote } from '../../components/States'
 import { CATEGORIES, PRIORITY_CHOICES, PRIORITY_HELP } from './language'
 
 const field =
   'mt-1.5 w-full rounded-sm border border-subtle bg-card px-3 py-2.5 outline-none focus:border-primary'
 
-export default function ReportForm({ onLogged }: { onLogged: () => void }) {
+export default function ReportForm({
+  onLogged,
+}: {
+  onLogged: (issueId: string) => void
+}) {
   const { profile } = useAuth()
   const queryClient = useQueryClient()
 
@@ -37,8 +42,9 @@ export default function ReportForm({ onLogged }: { onLogged: () => void }) {
   const chosenUnit = unitId || units.data?.[0]?.id || ''
 
   const log = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase.rpc('log_issue', {
+    mutationFn: async (): Promise<string> => {
+      // log_issue returns the issues row, so the new id costs no extra read.
+      const { data, error } = await supabase.rpc('log_issue', {
         p_unit_id: chosenUnit,
         p_category: category,
         p_priority: priority,
@@ -47,14 +53,16 @@ export default function ReportForm({ onLogged }: { onLogged: () => void }) {
         p_access_permission: access,
       })
       if (error) throw error
+      const row = (Array.isArray(data) ? data[0] : data) as { id: string }
+      return row.id
     },
-    onSuccess: async () => {
+    onSuccess: async (issueId) => {
       setTitle('')
       setDescription('')
       setAccess(false)
       setPriority('normal')
       await queryClient.invalidateQueries({ queryKey: ['my-issues'] })
-      onLogged()
+      onLogged(issueId)
     },
   })
 
@@ -65,6 +73,13 @@ export default function ReportForm({ onLogged }: { onLogged: () => void }) {
 
   return (
     <form onSubmit={onSubmit} className="space-y-5 px-5 py-6">
+      {units.isError && (
+        <ErrorNote
+          error={units.error}
+          what="We could not load your flats, so this form cannot be sent."
+        />
+      )}
+
       <label className="block">
         <span className="text-sm font-medium">Which flat?</span>
         <select
@@ -146,12 +161,12 @@ export default function ReportForm({ onLogged }: { onLogged: () => void }) {
         />
       </label>
 
-      <label className="flex items-start gap-2.5 rounded-sm border border-subtle bg-surface-2 px-3 py-3">
+      <label className="flex min-h-[44px] items-center gap-2.5 rounded-sm border border-subtle bg-surface-2 px-3 py-3">
         <input
           type="checkbox"
           checked={access}
           onChange={(e) => setAccess(e.target.checked)}
-          className="mt-0.5 accent-primary"
+          className="size-4 shrink-0 accent-primary"
         />
         <span className="text-sm">
           Someone may enter the flat while I am out.

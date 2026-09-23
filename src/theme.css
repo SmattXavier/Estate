@@ -106,6 +106,18 @@
   --shadow-e3: 0 12px 32px rgb(0 0 0 / 0.70);
 }
 
+/* Phone floors, from docs/DENSITY.md. Overriding Tailwind's size ramp here
+   rather than per component means text-xs cannot drop below 13px anywhere
+   on a phone, including in screens written later. Unlayered, so it wins
+   over Tailwind's @layer theme defaults. */
+@media (width < 48rem) {
+  :root {
+    --text-xs: 0.8125rem; /* 13px floor for refs and metadata */
+    --text-sm: 0.875rem; /* 14px for supporting text */
+    --text-base: 1rem; /* 16px for anything primary */
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   :root {
     --motion-fast: 1ms;
@@ -122,7 +134,9 @@
   body {
     margin: 0;
     font-family: var(--font-sans-stack);
-    font-size: 15px;
+    /* rem, not px, so a reader who has enlarged text in their OS or browser
+       settings actually gets larger text. */
+    font-size: 0.9375rem; /* 15px at default root size */
     line-height: 1.5;
     font-weight: 400;
     color: var(--foreground);
@@ -146,6 +160,24 @@
   textarea {
     font: inherit;
     color: inherit;
+  }
+
+  @media (width < 48rem) {
+    /* 16px is a hard floor on a phone: below it, iOS Safari force-zooms the
+       page the moment a field takes focus. Raising the body size lifts every
+       control with it, since they inherit. */
+    body {
+      font-size: 1rem;
+    }
+
+    /* 44px minimum for anything you tap. The checkbox keeps its own size —
+       its label carries the target instead. */
+    button,
+    select,
+    textarea,
+    input:not([type='checkbox']) {
+      min-height: 44px;
+    }
   }
 }
 

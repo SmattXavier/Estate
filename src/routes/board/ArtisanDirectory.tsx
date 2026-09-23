@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../auth/context'
 import { BOARD_SELECT, type BoardIssue } from '../../lib/issues'
+import { Empty, ErrorNote, SkeletonList } from '../../components/States'
 
 type Technician = {
   id: string
@@ -205,10 +206,28 @@ export default function ArtisanDirectory() {
           })}
         </ul>
 
-        {!shown.length && (
-          <p className="mt-6 text-sm text-foreground-muted">
-            No active artisan on the books for {active}.
-          </p>
+        {technicians.isError && (
+          <div className="mt-5">
+            <ErrorNote
+              error={technicians.error}
+              what="We could not load the artisan roster."
+            />
+          </div>
+        )}
+
+        {technicians.isPending && (
+          <div className="mt-5">
+            <SkeletonList rows={3} />
+          </div>
+        )}
+
+        {!technicians.isPending && !technicians.isError && !shown.length && (
+          <div className="mt-5">
+            <Empty>
+              No active artisan on the books for {active}. Artisans for this
+              trade would be listed here with their open jobs.
+            </Empty>
+          </div>
         )}
       </div>
     </div>
