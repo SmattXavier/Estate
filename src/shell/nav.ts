@@ -15,6 +15,7 @@ export const NAV: Record<Role, NavItem[]> = {
   facility_manager: [
     { to: '/board', label: 'Dispatch board', end: true },
     { to: '/board/artisans', label: 'Artisans' },
+    { to: '/board/charges', label: 'Service charge' },
   ],
   ceo: [
     { to: '/overview', label: 'Overview' },

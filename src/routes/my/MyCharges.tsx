@@ -1,17 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
 import Bar from '../../components/Bar'
+import SpendSection from '../charges/SpendSection'
 import { Empty, ErrorNote, SkeletonList } from '../../components/States'
 import { supabase } from '../../lib/supabase'
 import { naira } from '../../lib/money'
 import { useAuth } from '../../auth/context'
 import type { Tone } from '../../lib/issues'
-import {
-  NO_BILLS_YET,
-  NO_PAYMENTS_YET,
-  NO_SPEND_YET,
-  billLine,
-  dueDay,
-} from './language'
+import { NO_BILLS_YET, NO_PAYMENTS_YET, billLine, dueDay } from './language'
 
 type Bill = {
   bill_id: string
@@ -35,14 +30,6 @@ type Payment = {
   paid_on: string
   method: string
   reference: string | null
-}
-
-type Spend = {
-  period_id: string
-  period_label: string
-  category: string
-  spent: number | string
-  share_percent: number | string
 }
 
 /**
@@ -136,43 +123,6 @@ function BillCard({ bill, payments }: { bill: Bill; payments: Payment[] }) {
   )
 }
 
-function SpendSection({ rows }: { rows: Spend[] }) {
-  if (!rows.length) return <Empty>{NO_SPEND_YET}</Empty>
-
-  const period = rows[0].period_label
-  const total = rows.reduce((sum, row) => sum + Number(row.spent), 0)
-  const biggest = Math.max(...rows.map((row) => Number(row.spent)), 1)
-
-  return (
-    <div className="rounded-sm border border-subtle bg-card px-4 py-4">
-      <p className="max-w-prose text-base md:text-sm">
-        Across {period} the estate spent{' '}
-        <span className="num">{naira(total)}</span> keeping the place running.
-        This is where it went.
-      </p>
-
-      <ul className="mt-4 space-y-3">
-        {rows.map((row) => (
-          <li key={row.category}>
-            <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-              <span className="text-sm">{row.category}</span>
-              <span className="text-sm text-foreground-muted">
-                <span className="num">{naira(row.spent)}</span>
-                <span className="num ml-3 text-foreground-faint">
-                  {Number(row.share_percent)}%
-                </span>
-              </span>
-            </div>
-            {/* Share of the largest line, so the bars compare against each
-                other rather than all sitting near zero. */}
-            <Bar fraction={Number(row.spent) / biggest} tone="neutral" />
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
-}
-
 export default function MyCharges() {
   const { profile } = useAuth()
 
@@ -202,20 +152,6 @@ export default function MyCharges() {
         .order('paid_on', { ascending: false })
       if (error) throw error
       return (data ?? []) as Payment[]
-    },
-    enabled: !!profile,
-  })
-
-  const spend = useQuery({
-    queryKey: ['spend-breakdown', profile?.estate_id],
-    queryFn: async (): Promise<Spend[]> => {
-      const { data, error } = await supabase
-        .from('service_spend_breakdown')
-        .select('period_id, period_label, category, spent, share_percent')
-        .eq('estate_id', profile!.estate_id)
-        .order('spent', { ascending: false })
-      if (error) throw error
-      return (data ?? []) as Spend[]
     },
     enabled: !!profile,
   })
@@ -259,16 +195,7 @@ export default function MyCharges() {
       <section className="mt-8">
         <h2 className="text-base">Where the money went</h2>
         <div className="mt-3">
-          {spend.isPending ? (
-            <SkeletonList rows={1} />
-          ) : spend.isError ? (
-            <ErrorNote
-              error={spend.error}
-              what="We could not load what the charge was spent on."
-            />
-          ) : (
-            <SpendSection rows={spend.data} />
-          )}
+          <SpendSection estateId={profile?.estate_id} />
         </div>
       </section>
     </div>

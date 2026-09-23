@@ -130,6 +130,3 @@ export const NO_PAYMENTS_YET =
 
 export const NO_BILLS_YET =
   'No service charge has been raised for your flat yet. When it is, you will see what is owed and what has been paid.'
-
-export const NO_SPEND_YET =
-  'The estate office has not recorded what the charge was spent on yet.'

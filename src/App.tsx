@@ -9,6 +9,7 @@ import MyReports from './routes/my/MyReports'
 import MyCharges from './routes/my/MyCharges'
 import Board from './routes/board/Board'
 import ArtisanDirectory from './routes/board/ArtisanDirectory'
+import BoardCharges from './routes/board/BoardCharges'
 import Overview from './routes/overview/Overview'
 import Charges from './routes/charges/Charges'
 
@@ -97,6 +98,15 @@ export default function App() {
         element={
           <RequireRole role="facility_manager">
             <ArtisanDirectory />
+          </RequireRole>
+        }
+      />
+
+      <Route
+        path="/board/charges"
+        element={
+          <RequireRole role="facility_manager">
+            <BoardCharges />
           </RequireRole>
         }
       />
