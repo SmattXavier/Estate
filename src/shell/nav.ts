@@ -11,6 +11,7 @@ export const NAV: Record<Role, NavItem[]> = {
     { to: '/my/new', label: 'Report a fault' },
     { to: '/my/reports', label: 'My reports' },
     { to: '/my/charges', label: 'Service charge' },
+    { to: '/my/visitors', label: 'Visitors' },
   ],
   facility_manager: [
     { to: '/board', label: 'Dispatch board', end: true },
@@ -21,12 +22,16 @@ export const NAV: Record<Role, NavItem[]> = {
     { to: '/overview', label: 'Overview' },
     { to: '/charges', label: 'Service charge' },
   ],
+  security: [{ to: '/gate', label: 'Gate' }],
+  artisan: [{ to: '/shifts', label: 'My shifts' }],
 }
 
 export const ROLE_LABEL: Record<Role, string> = {
   resident: 'Resident',
   facility_manager: 'Facility manager',
   ceo: 'Chief executive',
+  security: 'Gate',
+  artisan: 'Artisan',
 }
 
 /** The page title for the mobile top bar, from the same config. */

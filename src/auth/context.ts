@@ -1,6 +1,16 @@
 import { createContext, useContext } from 'react'
 
-export type Role = 'resident' | 'facility_manager' | 'ceo'
+/**
+ * Every role the database can hand back. security and artisan have real
+ * accounts in the seed, so leaving them out of this union did not stop them
+ * signing in — it only stopped the app knowing where to put them.
+ */
+export type Role =
+  | 'resident'
+  | 'facility_manager'
+  | 'ceo'
+  | 'security'
+  | 'artisan'
 
 export type Profile = {
   id: string

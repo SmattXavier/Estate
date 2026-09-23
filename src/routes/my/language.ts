@@ -130,3 +130,90 @@ export const NO_PAYMENTS_YET =
 
 export const NO_BILLS_YET =
   'No service charge has been raised for your flat yet. When it is, you will see what is owed and what has been paid.'
+
+// ---------------------------------------------------------------------
+// Visitor passes
+// ---------------------------------------------------------------------
+
+/** Plain choices, not a number field. Hours are what the RPC takes. */
+export const PASS_DURATIONS: { label: string; hours: number }[] = [
+  { label: 'Today only', hours: 12 },
+  { label: '24 hours', hours: 24 },
+  { label: '3 days', hours: 72 },
+  { label: 'A week', hours: 168 },
+]
+
+/** "4:12pm" — how a person says a time out loud. */
+export function clockTime(iso: string): string {
+  return new Date(iso)
+    .toLocaleTimeString('en-NG', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+      timeZone: 'Africa/Lagos',
+    })
+    .replace(/\s?([AP]M)/i, (_, m: string) => m.toLowerCase())
+}
+
+/** "9:40pm tonight", "Thursday at 9:40pm" — never a bare timestamp. */
+export function untilWhen(iso: string): string {
+  const when = new Date(iso)
+  const days = Math.round(
+    (new Date(iso).setHours(0, 0, 0, 0) - new Date().setHours(0, 0, 0, 0)) /
+      86_400_000,
+  )
+  const time = clockTime(iso)
+  if (days === 0) return `${time} tonight`
+  if (days === 1) return `${time} tomorrow`
+  return `${when.toLocaleDateString('en-NG', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    timeZone: 'Africa/Lagos',
+  })} at ${time}`
+}
+
+/** What the resident is told about a pass, never the stored word. */
+export function passLine(
+  state: 'revoked' | 'used' | 'expired' | 'active',
+  validUntil: string,
+): string {
+  switch (state) {
+    case 'active':
+      return `Good until ${untilWhen(validUntil)}.`
+    case 'used':
+      return 'They have already come in on this one.'
+    case 'expired':
+      return 'This has run out. Make a new one if they are still coming.'
+    case 'revoked':
+      return 'You cancelled this one.'
+  }
+}
+
+/** "Chinedu came in at 4:12pm" — a sentence, not a log line. */
+export function gateLine(
+  visitor: string,
+  direction: 'in' | 'out',
+  at: string,
+): string {
+  const first = visitor.split(' ')[0]
+  return direction === 'in'
+    ? `${first} came in at ${clockTime(at)}.`
+    : `${first} left at ${clockTime(at)}.`
+}
+
+export function whatsAppMessage(
+  visitor: string,
+  code: string,
+  estate: string,
+  validUntil: string,
+): string {
+  const first = visitor.split(' ')[0]
+  return (
+    `Hello ${first}. Your gate code for ${estate} is ${code}. ` +
+    `Show it or read it out at the gate. It works until ${untilWhen(validUntil)}.`
+  )
+}
+
+export const NO_PASSES_YET =
+  'No visitors yet. Make a pass and the code appears here for you to send on.'

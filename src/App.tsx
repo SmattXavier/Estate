@@ -12,11 +12,15 @@ import ArtisanDirectory from './routes/board/ArtisanDirectory'
 import BoardCharges from './routes/board/BoardCharges'
 import Overview from './routes/overview/Overview'
 import Charges from './routes/charges/Charges'
+import Visitors from './routes/my/Visitors'
+import Holding from './routes/Holding'
 
 const HOME: Record<Role, string> = {
   resident: '/my/reports',
   facility_manager: '/board',
   ceo: '/overview',
+  security: '/gate',
+  artisan: '/shifts',
 }
 
 function Waiting() {
@@ -78,6 +82,15 @@ export default function App() {
       />
 
       <Route
+        path="/my/visitors"
+        element={
+          <RequireRole role="resident">
+            <Visitors />
+          </RequireRole>
+        }
+      />
+
+      <Route
         path="/board"
         element={
           <RequireRole role="facility_manager">
@@ -125,6 +138,26 @@ export default function App() {
         element={
           <RequireRole role="ceo">
             <Charges />
+          </RequireRole>
+        }
+      />
+
+      {/* Both HOME targets must resolve to a real route. Without these the
+          catch-all sends them back to "/", which sends them here again —
+          an endless redirect rather than a screen. Stage 2 replaces /gate. */}
+      <Route
+        path="/gate"
+        element={
+          <RequireRole role="security">
+            <Holding what="The gate screen is being built. It will let you check a visitor's code and log them in and out." />
+          </RequireRole>
+        }
+      />
+      <Route
+        path="/shifts"
+        element={
+          <RequireRole role="artisan">
+            <Holding what="Your shift screen is coming. For now the facility manager will call you when a job is yours." />
           </RequireRole>
         }
       />
