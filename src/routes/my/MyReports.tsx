@@ -35,7 +35,7 @@ export default function MyReports() {
   const open = issues.data?.filter((issue) => issue.status !== 'closed').length ?? 0
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6">
+    <div className="w-full px-4 py-6 sm:px-6 xl:px-8">
       <h1 className="text-xl">Your reports</h1>
       <p className="mt-1 text-sm text-foreground-muted">
         <span className="num">{open}</span>

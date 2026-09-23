@@ -62,7 +62,7 @@ function Expanded({ issue }: { issue: BoardIssue }) {
         <span>{issue.reporter?.full_name ?? 'Unknown'}</span>
         <span className="num">{timeOfDay(issue.created_at)}</span>
       </p>
-      <p className="mt-1.5">{issue.description}</p>
+      <p className="mt-1.5 max-w-prose">{issue.description}</p>
       {/* Verbatim: the CEO reads the record as it was written. */}
       <Timeline issueId={issue.id} />
     </>

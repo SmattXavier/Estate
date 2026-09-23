@@ -43,7 +43,7 @@ export default function Timeline({
       {updates.data.map((update) => (
         <li key={update.id} className="relative pb-3.5 last:pb-0">
           <span className="absolute top-1.5 -left-[21px] h-2 w-2 rounded-sm border border-strong bg-card" />
-          <p className="text-sm">
+          <p className="max-w-prose text-sm">
             {translate ? translate(update) : update.body}
           </p>
           <p className="mt-0.5 flex gap-3 text-xs text-foreground-faint">

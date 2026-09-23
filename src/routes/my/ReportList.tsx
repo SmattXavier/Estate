@@ -65,7 +65,9 @@ function Card({ issue, marked }: { issue: Issue; marked: boolean }) {
 
       {open && (
         <div className="border-t border-subtle px-4 py-4 md:py-3.5">
-          <p className="text-base leading-normal md:text-sm">{issue.description}</p>
+          <p className="max-w-prose text-base leading-normal md:text-sm">
+            {issue.description}
+          </p>
           <Timeline issueId={issue.id} translate={timelineBody} />
         </div>
       )}
@@ -89,8 +91,9 @@ export default function ReportList({
     )
   }
 
+  // One column until there is genuinely room for two.
   return (
-    <ul className="space-y-3">
+    <ul className="space-y-3 2xl:grid 2xl:grid-cols-2 2xl:gap-3 2xl:space-y-0">
       {issues.map((issue) => (
         <Card
           key={issue.id}

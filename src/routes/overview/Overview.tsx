@@ -72,7 +72,7 @@ export default function Overview() {
 
   return (
     <div>
-      <div className="px-4 pt-6 sm:px-6">
+      <div className="w-full px-4 pt-6 sm:px-6 xl:px-8">
         <h1 className="text-xl">Overview</h1>
         <p className="mt-1 max-w-xl text-sm text-foreground-muted">
           Alerts appear here only when an issue passes its target with nobody
@@ -84,7 +84,7 @@ export default function Overview() {
         <AlertPanel issues={all} />
       </div>
 
-      <div className="w-full px-4 py-5 sm:px-6">
+      <div className="w-full px-4 py-5 sm:px-6 xl:px-8">
         <div className="grid grid-cols-2 divide-x divide-y divide-subtle rounded-sm border border-subtle bg-card md:grid-cols-4 md:divide-y-0">
           <Figure label="Open issues" value={String(open)} />
           <Figure label="Past target now" value={String(pastTarget)} />

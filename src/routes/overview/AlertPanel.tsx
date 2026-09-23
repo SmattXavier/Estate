@@ -105,7 +105,7 @@ export default function AlertPanel({ issues }: { issues: BoardIssue[] }) {
 
   return (
     <section className="bg-destructive-surface text-destructive-on-surface shadow-e2">
-      <div className="w-full px-4 py-3 sm:px-6">
+      <div className="w-full px-4 py-3 sm:px-6 xl:px-8">
         <h2 className="text-base">
           {alerts.length === 1
             ? '1 issue has passed its target with nobody assigned'

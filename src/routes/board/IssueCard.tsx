@@ -200,7 +200,7 @@ export default function IssueCard({
             )}
           </dl>
 
-          <p className="mt-3 border-t border-subtle pt-3 text-sm">
+          <p className="mt-3 max-w-prose border-t border-subtle pt-3 text-sm">
             {issue.description}
           </p>
 

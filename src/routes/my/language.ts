@@ -34,6 +34,13 @@ export const PRIORITY_CHOICES: {
   { value: 'low', label: 'Whenever', target: 'within 24 hours' },
 ]
 
+/** The panel beside the form from 1280px. Three lines, resident language. */
+export const WHAT_HAPPENS_NEXT = [
+  'The estate office sees this the moment you send it.',
+  'The time shown against the urgency you choose is when someone should be on their way to you.',
+  'You can follow it any time under "My reports".',
+]
+
 export const PRIORITY_HELP =
   'This is how quickly the estate office aims to have someone on their way to you.'
 

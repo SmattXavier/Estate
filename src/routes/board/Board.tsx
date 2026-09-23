@@ -275,7 +275,7 @@ export default function Board() {
   }
 
   return (
-    <div className="flex h-dvh flex-col overflow-hidden p-6">
+    <div className="flex h-dvh flex-col overflow-hidden p-6 xl:p-8">
       <div className="shrink-0">{summary}</div>
 
       {issues.isError && (
