@@ -10,12 +10,16 @@ export const NAV: Record<Role, NavItem[]> = {
   resident: [
     { to: '/my/new', label: 'Report a fault' },
     { to: '/my/reports', label: 'My reports' },
+    { to: '/my/charges', label: 'Service charge' },
   ],
   facility_manager: [
     { to: '/board', label: 'Dispatch board', end: true },
     { to: '/board/artisans', label: 'Artisans' },
   ],
-  ceo: [{ to: '/overview', label: 'Overview' }],
+  ceo: [
+    { to: '/overview', label: 'Overview' },
+    { to: '/charges', label: 'Service charge' },
+  ],
 }
 
 export const ROLE_LABEL: Record<Role, string> = {

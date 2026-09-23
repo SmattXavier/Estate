@@ -203,16 +203,3 @@ export function assignedWithinTarget(issue: {
   if (!issue.assigned_at) return null
   return new Date(issue.assigned_at).getTime() <= new Date(issue.sla_due_at).getTime()
 }
-
-const NAIRA = new Intl.NumberFormat('en-NG', {
-  style: 'currency',
-  currency: 'NGN',
-  maximumFractionDigits: 0,
-})
-
-/** numeric(12,2) can arrive as a string; a dash beats "₦NaN". */
-export function naira(value: number | string | null): string {
-  if (value === null || value === '') return '—'
-  const amount = Number(value)
-  return Number.isFinite(amount) ? NAIRA.format(amount) : '—'
-}

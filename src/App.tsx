@@ -6,9 +6,11 @@ import Shell from './shell/Shell'
 import SignIn from './routes/SignIn'
 import NewReport from './routes/my/NewReport'
 import MyReports from './routes/my/MyReports'
+import MyCharges from './routes/my/MyCharges'
 import Board from './routes/board/Board'
 import ArtisanDirectory from './routes/board/ArtisanDirectory'
 import Overview from './routes/overview/Overview'
+import Charges from './routes/charges/Charges'
 
 const HOME: Record<Role, string> = {
   resident: '/my/reports',
@@ -66,6 +68,15 @@ export default function App() {
       />
 
       <Route
+        path="/my/charges"
+        element={
+          <RequireRole role="resident">
+            <MyCharges />
+          </RequireRole>
+        }
+      />
+
+      <Route
         path="/board"
         element={
           <RequireRole role="facility_manager">
@@ -95,6 +106,15 @@ export default function App() {
         element={
           <RequireRole role="ceo">
             <Overview />
+          </RequireRole>
+        }
+      />
+
+      <Route
+        path="/charges"
+        element={
+          <RequireRole role="ceo">
+            <Charges />
           </RequireRole>
         }
       />

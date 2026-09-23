@@ -2,6 +2,7 @@ import { Fragment, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import Timeline from '../../components/Timeline'
 import { useMediaQuery } from '../../lib/useMediaQuery'
+import { naira } from '../../lib/money'
 import { Empty } from '../../components/States'
 import {
   TONE_BORDER,
@@ -10,7 +11,6 @@ import {
   cardTone,
   isEscalated,
   minutesToAssign,
-  naira,
   timeOfDay,
   type BoardIssue,
   type Tone,

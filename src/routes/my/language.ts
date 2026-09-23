@@ -1,5 +1,5 @@
-// Everything this screen says, in one place. Mechanics live in
-// src/lib/issues.ts; this file is only wording.
+// Everything the resident screens say, in one place. Mechanics live in
+// src/lib/issues.ts and src/lib/money.ts; this file is only wording.
 //
 // The resident screen never says SLA, ticket, escalate, dispatch, priority
 // level or status code. If a word like that appears anywhere in the /my
@@ -86,3 +86,50 @@ export const ESCALATION_LINE =
 export function timelineBody(update: IssueUpdate): string {
   return update.kind === 'escalation' ? ESCALATION_LINE : update.body
 }
+
+// ---------------------------------------------------------------------
+// Service charge
+// ---------------------------------------------------------------------
+
+/** "12 September", and the year too when it is not this one. */
+export function dueDay(iso: string): string {
+  const date = new Date(iso + 'T00:00:00')
+  const sameYear = date.getFullYear() === new Date().getFullYear()
+  return date.toLocaleDateString('en-NG', {
+    day: 'numeric',
+    month: 'long',
+    ...(sameYear ? {} : { year: 'numeric' }),
+    timeZone: 'Africa/Lagos',
+  })
+}
+
+/**
+ * What the bill is doing, in one sentence. pay_status and is_overdue are
+ * two separate facts and a bill can carry both, so a part paid bill that is
+ * also late says both things rather than picking one.
+ */
+export function billLine(bill: {
+  pay_status: string
+  is_overdue: boolean
+  days_overdue: number
+}): string {
+  if (bill.pay_status === 'paid') return 'Paid in full. Thank you.'
+  const late = `It is ${bill.days_overdue} ${
+    bill.days_overdue === 1 ? 'day' : 'days'
+  } past the date it was due.`
+  if (bill.pay_status === 'part paid') {
+    return bill.is_overdue
+      ? `You have paid part of this. ${late}`
+      : 'You have paid part of this.'
+  }
+  return bill.is_overdue ? `Nothing paid yet. ${late}` : 'Nothing paid yet.'
+}
+
+export const NO_PAYMENTS_YET =
+  'No payments yet. Anything the estate office records against this bill will appear here.'
+
+export const NO_BILLS_YET =
+  'No service charge has been raised for your flat yet. When it is, you will see what is owed and what has been paid.'
+
+export const NO_SPEND_YET =
+  'The estate office has not recorded what the charge was spent on yet.'

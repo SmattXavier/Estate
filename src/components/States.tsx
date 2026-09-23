@@ -45,8 +45,23 @@ export function Empty({ children }: { children: ReactNode }) {
  * A failed read, said out loud. A query that errors must not look the same
  * as a query that returned nothing.
  */
+/**
+ * Supabase does not throw Error instances — a PostgrestError is a plain
+ * object with a message field, so `String(error)` gives "[object Object]"
+ * and the server's actual words ("that would overpay the bill by 50,000")
+ * never reach the screen.
+ */
+function readable(error: unknown): string {
+  if (error instanceof Error) return error.message
+  if (error && typeof error === 'object' && 'message' in error) {
+    const message = (error as { message?: unknown }).message
+    if (typeof message === 'string' && message) return message
+  }
+  return String(error)
+}
+
 export function ErrorNote({ error, what }: { error: unknown; what: string }) {
-  const message = error instanceof Error ? error.message : String(error)
+  const message = readable(error)
   return (
     <p
       role="alert"

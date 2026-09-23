@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
+import Bar from './Bar'
 import {
-  TONE_FILL,
   countdownLabel,
   countdownTone,
   windowLeft,
@@ -28,28 +28,6 @@ export default function CountdownBar({ issue }: { issue: Clocked }) {
   const filled = remaining <= 0 ? 1 : fraction
 
   return (
-    <div className="mt-3 flex items-center gap-3">
-      <div className="h-1.5 grow overflow-hidden rounded-sm bg-surface-2">
-        <div
-          className={`h-full rounded-sm ${TONE_FILL[tone]} transition-[width] ease-linear`}
-          style={{
-            width: `${filled * 100}%`,
-            // Collapses to 1ms under prefers-reduced-motion, via the token.
-            transitionDuration: 'var(--motion-slow)',
-          }}
-        />
-      </div>
-      <span
-        className={`num shrink-0 text-xs ${
-          tone === 'destructive'
-            ? 'text-destructive'
-            : tone === 'warning'
-              ? 'text-warning'
-              : 'text-foreground-muted'
-        }`}
-      >
-        {countdownLabel(remaining)}
-      </span>
-    </div>
+    <Bar fraction={filled} tone={tone} animate label={countdownLabel(remaining)} />
   )
 }

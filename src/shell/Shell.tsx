@@ -110,17 +110,19 @@ export default function Shell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-dvh bg-background">
       <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-subtle bg-card px-3 py-2">
+        {/* 44px square: the drawer only exists below 1024px, where this is a
+            touch target at every width including the 768px tablet edge. */}
         <button
           type="button"
           onClick={() => setOpen(true)}
           aria-label="Open navigation"
           aria-expanded={open}
-          className="rounded-sm border border-subtle px-2.5 py-1.5 text-sm"
+          className="flex size-11 shrink-0 flex-col items-center justify-center gap-1 rounded-sm border border-subtle"
         >
           {/* Drawn, not an icon font: three rules. */}
           <span aria-hidden="true" className="block h-px w-4 bg-foreground" />
-          <span aria-hidden="true" className="mt-1 block h-px w-4 bg-foreground" />
-          <span aria-hidden="true" className="mt-1 block h-px w-4 bg-foreground" />
+          <span aria-hidden="true" className="block h-px w-4 bg-foreground" />
+          <span aria-hidden="true" className="block h-px w-4 bg-foreground" />
         </button>
         <h1 className="truncate text-base">{title}</h1>
       </header>
