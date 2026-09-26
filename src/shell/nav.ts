@@ -17,6 +17,7 @@ export const NAV: Record<Role, NavItem[]> = {
     { to: '/board', label: 'Dispatch board', end: true },
     { to: '/board/artisans', label: 'Artisans' },
     { to: '/board/charges', label: 'Service charge' },
+    { to: '/board/attendance', label: 'Attendance' },
   ],
   ceo: [
     { to: '/overview', label: 'Overview' },

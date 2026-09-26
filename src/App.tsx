@@ -10,6 +10,7 @@ import MyCharges from './routes/my/MyCharges'
 import Board from './routes/board/Board'
 import ArtisanDirectory from './routes/board/ArtisanDirectory'
 import BoardCharges from './routes/board/BoardCharges'
+import Attendance from './routes/board/Attendance'
 import Overview from './routes/overview/Overview'
 import Charges from './routes/charges/Charges'
 import Visitors from './routes/my/Visitors'
@@ -122,6 +123,15 @@ export default function App() {
         element={
           <RequireRole role="facility_manager">
             <BoardCharges />
+          </RequireRole>
+        }
+      />
+
+      <Route
+        path="/board/attendance"
+        element={
+          <RequireRole role="facility_manager">
+            <Attendance />
           </RequireRole>
         }
       />
