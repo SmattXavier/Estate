@@ -22,7 +22,10 @@ export const NAV: Record<Role, NavItem[]> = {
     { to: '/overview', label: 'Overview' },
     { to: '/charges', label: 'Service charge' },
   ],
-  security: [{ to: '/gate', label: 'Gate' }],
+  security: [
+    { to: '/gate', label: 'Gate', end: true },
+    { to: '/gate/today', label: 'Today' },
+  ],
   artisan: [{ to: '/shifts', label: 'My shifts' }],
 }
 

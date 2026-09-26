@@ -14,6 +14,8 @@ import Overview from './routes/overview/Overview'
 import Charges from './routes/charges/Charges'
 import Visitors from './routes/my/Visitors'
 import Holding from './routes/Holding'
+import Gate from './routes/gate/Gate'
+import GateToday from './routes/gate/Today'
 
 const HOME: Record<Role, string> = {
   resident: '/my/reports',
@@ -144,12 +146,20 @@ export default function App() {
 
       {/* Both HOME targets must resolve to a real route. Without these the
           catch-all sends them back to "/", which sends them here again —
-          an endless redirect rather than a screen. Stage 2 replaces /gate. */}
+          an endless redirect rather than a screen. */}
       <Route
         path="/gate"
         element={
           <RequireRole role="security">
-            <Holding what="The gate screen is being built. It will let you check a visitor's code and log them in and out." />
+            <Gate />
+          </RequireRole>
+        }
+      />
+      <Route
+        path="/gate/today"
+        element={
+          <RequireRole role="security">
+            <GateToday />
           </RequireRole>
         }
       />
