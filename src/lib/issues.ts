@@ -28,6 +28,14 @@ export type Issue = {
   sla_due_at: string
   escalated_at: string | null
   unit: { label: string } | null
+  /**
+   * Filled in when the manager records the fix. Optional because
+   * BOARD_SELECT does not fetch work_done — making these required would
+   * make the board's cast a lie.
+   */
+  work_done?: string | null
+  work_materials?: string | null
+  work_cost?: number | string | null
 }
 
 export type IssueUpdate = {

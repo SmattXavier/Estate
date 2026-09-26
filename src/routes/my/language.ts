@@ -217,3 +217,20 @@ export function whatsAppMessage(
 
 export const NO_PASSES_YET =
   'No visitors yet. Make a pass and the code appears here for you to send on.'
+
+// ---------------------------------------------------------------------
+// Closing the loop
+//
+// The resident screen never says resolved, reopen or status. It asks a
+// question a person would actually ask, and gives two plain answers.
+// ---------------------------------------------------------------------
+
+export const FIX_ASK = 'Someone has been out. Is it sorted?'
+export const FIX_DID = 'What they did'
+export const FIX_USED = 'What they used'
+export const FIX_YES = 'Yes, it is fixed'
+export const FIX_NO = 'No, still broken'
+
+/** The cost stays off this screen: they are being asked whether it works. */
+export const FIX_REOPENED =
+  'Thank you. We have told the estate office and the clock has started again.'

@@ -21,7 +21,7 @@ export default function MyReports() {
       const { data, error } = await supabase
         .from('issues')
         .select(
-          'id, ref, unit_id, title, description, category, priority, status, created_at, clock_started_at, sla_due_at, escalated_at, unit:units(label)',
+          'id, ref, unit_id, title, description, category, priority, status, created_at, clock_started_at, sla_due_at, escalated_at, work_done, work_materials, unit:units(label)',
         )
         .eq('reported_by', profile!.id)
         .order('created_at', { ascending: false })

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import CountdownBar from '../../components/CountdownBar'
 import Timeline from '../../components/Timeline'
+import ResolveForm from './ResolveForm'
 import { supabase } from '../../lib/supabase'
 import {
   BOARD_ISSUES_KEY,
@@ -215,6 +216,8 @@ export default function IssueCard({
               Choose an artisan
             </button>
           )}
+
+          {issue.status === 'assigned' && <ResolveForm issue={issue} />}
 
           {issue.status === 'submitted' && draft && (
             <DispatchForm
