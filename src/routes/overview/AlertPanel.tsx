@@ -35,7 +35,7 @@ function ChaseButton({ issue, now }: { issue: BoardIssue; now: number }) {
       <button
         type="button"
         disabled
-        className="w-full shrink-0 rounded-sm border border-destructive-on-surface/30 px-3 py-1.5 text-sm text-destructive-on-surface/60 md:w-auto"
+        className="min-h-11 w-full shrink-0 rounded-sm border border-destructive-on-surface/30 px-3 py-1.5 text-sm text-destructive-on-surface/60 md:w-auto"
       >
         Chased{' '}
         <span className="num">
@@ -52,7 +52,7 @@ function ChaseButton({ issue, now }: { issue: BoardIssue; now: number }) {
         type="button"
         onClick={() => chase.mutate()}
         disabled={chase.isPending}
-        className="w-full rounded-sm border border-destructive-on-surface bg-destructive-on-surface px-3 py-1.5 text-sm font-medium text-destructive-surface hover:bg-transparent hover:text-destructive-on-surface disabled:opacity-60 md:w-auto"
+        className="min-h-11 w-full rounded-sm border border-destructive-on-surface bg-destructive-on-surface px-3 py-1.5 text-sm font-medium text-destructive-surface hover:bg-transparent hover:text-destructive-on-surface disabled:opacity-60 md:w-auto"
       >
         {chase.isPending ? 'Chasing…' : 'Chase the manager'}
       </button>

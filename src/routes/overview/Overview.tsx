@@ -12,6 +12,7 @@ import {
 import AlertPanel from './AlertPanel'
 import IssueTable from './IssueTable'
 import { ErrorNote, SkeletonList } from '../../components/States'
+import ExportButton from './ExportButton'
 
 function Figure({ label, value }: { label: string; value: string }) {
   return (
@@ -108,6 +109,13 @@ export default function Overview() {
             <IssueTable issues={all} />
           )}
         </div>
+
+        <section className="mt-8">
+          <h2 className="text-base">Export</h2>
+          <div className="mt-3">
+            <ExportButton />
+          </div>
+        </section>
       </div>
     </div>
   )

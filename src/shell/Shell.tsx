@@ -18,7 +18,8 @@ function Links({ items, onNavigate }: { items: NavItem[]; onNavigate: () => void
           end={item.end}
           onClick={onNavigate}
           className={({ isActive }) =>
-            `relative block rounded-sm py-2 pr-3 pl-4 text-sm ${
+            // 44px minimum, on a mouse as well as a thumb.
+            `relative flex min-h-11 items-center rounded-sm py-2 pr-3 pl-4 text-sm ${
               isActive
                 ? 'bg-shell-foreground/10 text-shell-foreground'
                 : 'text-shell-foreground/65 hover:bg-shell-foreground/5 hover:text-shell-foreground'
@@ -90,7 +91,7 @@ export default function Shell({ children }: { children: ReactNode }) {
         <button
           type="button"
           onClick={() => void signOut()}
-          className="mt-3 w-full rounded-sm border border-shell-foreground/25 px-3 py-2 text-sm text-shell-foreground/80 hover:border-shell-foreground/50"
+          className="mt-3 min-h-11 w-full rounded-sm border border-shell-foreground/25 px-3 py-2 text-sm text-shell-foreground/80 hover:border-shell-foreground/50"
         >
           Sign out
         </button>

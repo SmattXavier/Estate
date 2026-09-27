@@ -16,7 +16,7 @@ export default function ThemeToggle() {
           type="button"
           onClick={() => setTheme(mode)}
           aria-pressed={theme === mode}
-          className={`grow rounded-sm px-2 py-1 text-xs capitalize ${
+          className={`min-h-11 grow rounded-sm px-2 py-1 text-xs capitalize ${
             theme === mode
               ? 'bg-shell-foreground/15 text-shell-foreground'
               : 'text-shell-foreground/60 hover:text-shell-foreground'
