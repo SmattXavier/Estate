@@ -11,10 +11,10 @@ import Board from './routes/board/Board'
 import ArtisanDirectory from './routes/board/ArtisanDirectory'
 import BoardCharges from './routes/board/BoardCharges'
 import Attendance from './routes/board/Attendance'
+import Shifts from './routes/shifts/Shifts'
 import Overview from './routes/overview/Overview'
 import Charges from './routes/charges/Charges'
 import Visitors from './routes/my/Visitors'
-import Holding from './routes/Holding'
 import Gate from './routes/gate/Gate'
 import GateToday from './routes/gate/Today'
 
@@ -177,7 +177,7 @@ export default function App() {
         path="/shifts"
         element={
           <RequireRole role="artisan">
-            <Holding what="Your shift screen is coming. For now the facility manager will call you when a job is yours." />
+            <Shifts />
           </RequireRole>
         }
       />
